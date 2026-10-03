@@ -1,14 +1,18 @@
 """
-PDF Master Toolkit - Web Application (iLovePDF Offline Clone)
-Run with: streamlit run app_web.py
+PDF Master Toolkit - Modern Web Application
+Matching exact Document Automation Dashboard UI
+(Merge PDF, Split PDF, Compress PDF, Protect PDF, PPT to PDF)
 """
 
 import os
 import io
+import json
+import time
 import zipfile
 import tempfile
-import streamlit as st
+from datetime import datetime
 from pathlib import Path
+import streamlit as st
 
 from core import (
     bulk_convert_ppt_to_pdf,
@@ -28,43 +32,45 @@ from core import (
 )
 
 st.set_page_config(
-    page_title="PDF Master Toolkit (Offline iLovePDF)",
+    page_title="Document Automation - PDF Master Toolkit",
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS styling
-st.markdown("""
-<style>
-    .main-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 0.2rem;
-    }
-    .sub-title {
-        font-size: 1.05rem;
-        color: #64748B;
-        margin-bottom: 1.5rem;
-    }
-    .card-box {
-        background-color: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .stButton>button {
-        border-radius: 8px;
-        font-weight: 600;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Persistent Recent Files Helper
+RECENT_FILES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recent_files.json")
 
 
-def get_zip_download(files_dict: dict, zip_filename: str):
-    """Creates in-memory zip archive from filename -> bytes dictionary."""
+def load_recent_files():
+    if os.path.exists(RECENT_FILES_PATH):
+        try:
+            with open(RECENT_FILES_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+
+def save_recent_file(filename: str, tool_name: str, file_size_kb: float):
+    recent = load_recent_files()
+    entry = {
+        "filename": filename,
+        "tool": tool_name,
+        "size_kb": round(file_size_kb, 1),
+        "timestamp": datetime.now().strftime("%b %d, %Y - %I:%M %p")
+    }
+    # Keep up to 20 recent files, newest first
+    recent.insert(0, entry)
+    recent = recent[:20]
+    try:
+        with open(RECENT_FILES_PATH, "w", encoding="utf-8") as f:
+            json.dump(recent, f, indent=2)
+    except Exception:
+        pass
+
+
+def get_zip_bytes(files_dict: dict):
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
         for fname, data in files_dict.items():
@@ -73,118 +79,595 @@ def get_zip_download(files_dict: dict, zip_filename: str):
     return zip_buffer.getvalue()
 
 
-# Sidebar Navigation
-st.sidebar.markdown("## 🛠️ **PDF Master Tools**")
-tool_choice = st.sidebar.radio(
-    "Choose Tool:",
-    [
-        "📊 Bulk PPT to PDF",
-        "📑 Merge PDFs",
-        "✂️ Split PDF",
-        "🗜️ Compress PDF",
-        "🖼️ Images to PDF",
-        "📄 PDF to Images",
-        "💧 Add Watermark",
-        "🔒 Protect / Unlock",
-        "📝 Extract Text & Images",
-        "🔄 Rotate PDF"
+# Initialize session state for navigation
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "dashboard"
+
+# Custom CSS for Pixel-Perfect Dashboard matching the user's design
+st.markdown("""
+<style>
+    /* Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #FBFBFC;
+        color: #1E293B;
+    }
+
+    /* Main container padding */
+    .block-container {
+        padding-top: 1.8rem;
+        padding-bottom: 3rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 1240px;
+    }
+
+    /* Hide standard Streamlit header & footer */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #ECEEF1 !important;
+        padding-top: 1rem;
+    }
+    [data-testid="stSidebar"] .block-container {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+    }
+
+    /* Dark Pill Badge in Sidebar */
+    .sidebar-badge-container {
+        margin-bottom: 1.2rem;
+        margin-top: 0.2rem;
+    }
+    .sidebar-badge {
+        display: inline-block;
+        background-color: #18181B;
+        color: #FFFFFF;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 4px;
+    }
+
+    /* Primary Coral/Orange Buttons */
+    .coral-btn, .stButton>button[kind="primary"] {
+        background-color: #FF5A36 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.92rem !important;
+        padding: 0.65rem 1.4rem !important;
+        width: 100% !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(255, 90, 54, 0.2) !important;
+    }
+    .coral-btn:hover, .stButton>button[kind="primary"]:hover {
+        background-color: #E64724 !important;
+        box-shadow: 0 4px 8px rgba(255, 90, 54, 0.3) !important;
+        transform: translateY(-1px);
+    }
+    .coral-btn:active, .stButton>button[kind="primary"]:active {
+        transform: translateY(0);
+    }
+
+    /* Secondary Buttons */
+    .stButton>button[kind="secondary"] {
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        border: 1px solid #E2E8F0 !important;
+        background-color: #FFFFFF !important;
+        color: #334155 !important;
+    }
+    .stButton>button[kind="secondary"]:hover {
+        background-color: #F8FAFC !important;
+        border-color: #CBD5E1 !important;
+    }
+
+    /* Tool Card Style */
+    .tool-card {
+        background-color: #FFFFFF;
+        border: 1px solid #EAEBEF;
+        border-radius: 12px;
+        padding: 22px 24px;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        margin-bottom: 20px;
+    }
+    .tool-card:hover {
+        border-color: #FFD4C9;
+        box-shadow: 0 6px 16px rgba(255, 90, 54, 0.08);
+        transform: translateY(-2px);
+    }
+
+    /* Tool Icon Container */
+    .tool-icon-wrapper {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background-color: #FFF0EB;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .tool-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 6px;
+    }
+
+    .tool-desc {
+        font-size: 0.88rem;
+        color: #6B7280;
+        line-height: 1.4;
+        margin-bottom: 18px;
+        min-height: 40px;
+    }
+
+    .tool-subtext {
+        font-size: 0.8rem;
+        color: #9CA3AF;
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    /* Promo Card (Peach Background) */
+    .promo-card {
+        background-color: #FFF4EF;
+        border: 1px solid #FFE4D9;
+        border-radius: 12px;
+        padding: 24px;
+        min-height: 220px;
+        margin-bottom: 20px;
+    }
+    .promo-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background-color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+    .promo-title {
+        font-size: 1.12rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 14px;
+        line-height: 1.35;
+    }
+    .promo-item {
+        font-size: 0.88rem;
+        color: #374151;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .promo-check {
+        color: #FF5A36;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Recent Files Header */
+    .recent-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #ECEEF1;
+    }
+    .recent-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    .recent-link {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #FF5A36;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 28px;
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background-color: #FF5A36;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(255, 90, 54, 0.4);
+        cursor: pointer;
+        z-index: 999;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .fab-btn:hover {
+        background-color: #E64724;
+        transform: scale(1.05);
+    }
+
+    /* Workspace Action Card */
+    .action-panel {
+        background: #FFFFFF;
+        border: 1px solid #EAEBEF;
+        border-radius: 14px;
+        padding: 26px 30px;
+        margin-top: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
+# =====================================================================
+# SIDEBAR
+# =====================================================================
+with st.sidebar:
+    st.markdown("""
+    <div class="sidebar-badge-container">
+        <div class="sidebar-badge">DOCUMENT AUTOMATION</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Sidebar Navigation Buttons
+    nav_items = [
+        ("dashboard", "🏠 Dashboard"),
+        ("merge", "📑 Merge PDF"),
+        ("split", "✂️ Split PDF"),
+        ("compress", "🗜️ Compress PDF"),
+        ("protect", "🔒 Protect PDF"),
+        ("ppt2pdf", "📊 PPT to PDF"),
+        ("more_tools", "🛠️ More Tools (Images/Watermark)"),
     ]
-)
 
-st.sidebar.markdown("---")
-st.sidebar.info(
-    "**100% Offline & Private**\n\n"
-    "All file conversions happen locally on your computer with full privacy and high-speed native automation."
-)
+    for key, label in nav_items:
+        is_active = (st.session_state.current_view == key)
+        btn_type = "primary" if is_active else "secondary"
+        if st.button(label, key=f"nav_{key}", type=btn_type):
+            st.session_state.current_view = key
+            st.rerun()
+
+    st.markdown("<hr style='border: none; border-top: 1px solid #ECEEF1; margin: 24px 0 16px 0;'>", unsafe_allow_html=True)
+
+    # Bottom links
+    if st.button("🕒 Recent Files", key="nav_recent", type="secondary"):
+        st.session_state.current_view = "recent_view"
+        st.rerun()
+
+    if st.button("⚙️ Settings", key="nav_settings", type="secondary"):
+        st.session_state.current_view = "settings_view"
+        st.rerun()
+
+    if st.button("❓ Help", key="nav_help", type="secondary"):
+        st.session_state.current_view = "help_view"
+        st.rerun()
+
+
+# Helper to navigate to a tool
+def switch_view(view_name):
+    st.session_state.current_view = view_name
+    st.rerun()
+
 
 # =====================================================================
-# 1. BULK PPT TO PDF
+# VIEW 1: DASHBOARD (EXACT SCREENSHOT LAYOUT)
 # =====================================================================
-if tool_choice == "📊 Bulk PPT to PDF":
-    st.markdown('<div class="main-title">📊 Bulk PowerPoint to PDF Converter</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Convert 100+ PPT and PPTX presentations to PDF with high fidelity using native PowerPoint automation.</div>', unsafe_allow_html=True)
+if st.session_state.current_view == "dashboard":
+    # 2 Rows of 3 Columns Grid
+    # Row 1: Merge PDF, Split PDF, Compress PDF
+    col1, col2, col3 = st.columns(3, gap="medium")
 
-    mode = st.radio("Choose Input Method:", ["Select Folder Path on Disk (Fastest for 100+ files)", "Upload Files via Browser"], horizontal=True)
+    with col1:
+        st.markdown("""
+        <div class="tool-card">
+            <div>
+                <div class="tool-icon-wrapper">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/>
+                        <path d="M14 2V7H19"/>
+                        <path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>
+                    </svg>
+                </div>
+                <div class="tool-title">Merge PDF</div>
+                <div class="tool-desc">Combine multiple PDF files into one.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Select Files", key="btn_dash_merge", type="primary"):
+            switch_view("merge")
+        st.markdown('<div class="tool-subtext">No files selected</div>', unsafe_allow_html=True)
 
-    if mode == "Select Folder Path on Disk (Fastest for 100+ files)":
-        st.markdown("##### 📁 Scan Local Folder")
-        folder_path = st.text_input("Enter Folder Path on your computer:", placeholder=r"C:\Users\username\Documents\Presentations")
-        col_opt1, col_opt2 = st.columns([1, 1])
-        with col_opt1:
-            recursive = st.checkbox("Scan subfolders recursively", value=True)
-        with col_opt2:
-            out_folder = st.text_input("Output Directory (Optional, leave blank for same folder):", "")
+    with col2:
+        st.markdown("""
+        <div class="tool-card">
+            <div>
+                <div class="tool-icon-wrapper">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
+                        <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>
+                    </svg>
+                </div>
+                <div class="tool-title">Split PDF</div>
+                <div class="tool-desc">Extract pages or split into multiple files.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Select File", key="btn_dash_split", type="primary"):
+            switch_view("split")
+        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
 
-        if folder_path:
-            if os.path.isdir(folder_path):
-                found_files = find_presentation_files(folder_path, recursive=recursive)
-                st.success(f"Found **{len(found_files)}** presentation file(s) in `{folder_path}`")
-                
-                if found_files:
-                    with st.expander("View Discovered Files"):
-                        for f in found_files[:50]:
-                            st.caption(f)
-                        if len(found_files) > 50:
-                            st.caption(f"... and {len(found_files) - 50} more files.")
+    with col3:
+        st.markdown("""
+        <div class="tool-card">
+            <div>
+                <div class="tool-icon-wrapper">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 14H10V20"/>
+                        <path d="M10 14L3 21"/>
+                        <path d="M20 10H14V4"/>
+                        <path d="M14 10L21 3"/>
+                    </svg>
+                </div>
+                <div class="tool-title">Compress PDF</div>
+                <div class="tool-desc">Reduce file size while keeping quality.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Select File", key="btn_dash_compress", type="primary"):
+            switch_view("compress")
+        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
 
-                    if st.button("⚡ Convert All Presentations to PDF Now", type="primary"):
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
-                        out_dir = out_folder.strip() if out_folder.strip() else None
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
-                        def cb(cur, tot, name, success, msg):
-                            progress_bar.progress(cur / tot)
-                            status_text.text(f"Converting [{cur}/{tot}]: {name}")
+    # Row 2: Protect PDF, PPT to PDF, Promo Banner Card
+    col4, col5, col6 = st.columns(3, gap="medium")
 
-                        with st.spinner("Converting files in bulk..."):
-                            summary = bulk_convert_ppt_to_pdf(found_files, output_dir=out_dir, progress_callback=cb)
-                        
-                        st.success(f"🎉 Done! Converted {summary['success']} files successfully ({summary['failed']} failed).")
-                        if out_dir:
-                            st.info(f"PDFs saved to: `{out_dir}`")
-                        else:
-                            st.info("PDFs saved alongside each original file.")
-            else:
-                st.warning("Please enter a valid directory path.")
+    with col4:
+        st.markdown("""
+        <div class="tool-card">
+            <div>
+                <div class="tool-icon-wrapper">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                </div>
+                <div class="tool-title">Protect PDF</div>
+                <div class="tool-desc">Add a password and set permissions.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Select File", key="btn_dash_protect", type="primary"):
+            switch_view("protect")
+        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
 
+    with col5:
+        st.markdown("""
+        <div class="tool-card">
+            <div>
+                <div class="tool-icon-wrapper">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                        <path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>
+                    </svg>
+                </div>
+                <div class="tool-title">PPT to PDF</div>
+                <div class="tool-desc">Convert PowerPoint files to PDF.</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Select File", key="btn_dash_ppt", type="primary"):
+            switch_view("ppt2pdf")
+        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
+
+    with col6:
+        st.markdown("""
+        <div class="promo-card">
+            <div class="promo-icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
+                    <path d="M14 2V8H20"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+            </div>
+            <div class="promo-title">Five powerful tools.<br>One reliable workspace.</div>
+            <div class="promo-item"><span class="promo-check">✓</span> 100% offline</div>
+            <div class="promo-item"><span class="promo-check">✓</span> Your files stay on your computer</div>
+            <div class="promo-item"><span class="promo-check">✓</span> Fast and easy to use</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # -------------------------------------------------------------
+    # RECENT FILES SECTION
+    # -------------------------------------------------------------
+    st.markdown("""
+    <div class="recent-header">
+        <div class="recent-title">Recent Files</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    recent_list = load_recent_files()
+
+    if not recent_list:
+        st.markdown("""
+        <div style="background-color: #FFFFFF; border: 1px dashed #E2E8F0; border-radius: 10px; padding: 30px; text-align: center; color: #94A3B8;">
+            <p style="margin: 0; font-size: 0.95rem;">No recent files yet. Select a tool above to start converting or processing your documents.</p>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.markdown("##### 📤 Upload Presentation Files")
-        uploaded_files = st.file_uploader("Upload .pptx or .ppt files (select multiple)", type=["pptx", "ppt", "pps", "ppsx"], accept_multiple_files=True)
-        
-        if uploaded_files:
-            st.info(f"Selected {len(uploaded_files)} presentation(s).")
-            if st.button("⚡ Convert & Download ZIP", type="primary"):
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    input_paths = []
-                    for uf in uploaded_files:
-                        in_p = os.path.join(temp_dir, uf.name)
-                        with open(in_p, "wb") as f:
-                            f.write(uf.getbuffer())
-                        input_paths.append(in_p)
+        for idx, item in enumerate(recent_list[:5]):
+            c_icon, c_info, c_time = st.columns([0.6, 6, 2])
+            with c_icon:
+                st.markdown("""
+                <div style="background: #FFF0EB; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #FF5A36; font-size: 1rem;">📄</span>
+                </div>
+                """, unsafe_allow_html=True)
+            with c_info:
+                st.markdown(f"**{item['filename']}** &nbsp; <span style='background: #F1F5F9; color: #475569; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;'>{item['tool']}</span> &nbsp; <span style='color: #94A3B8; font-size: 0.8rem;'>{item['size_kb']} KB</span>", unsafe_allow_html=True)
+            with c_time:
+                st.caption(item.get("timestamp", ""))
+            st.markdown("<hr style='border: none; border-top: 1px solid #F1F5F9; margin: 6px 0 10px 0;'>", unsafe_allow_html=True)
 
-                    out_dir = os.path.join(temp_dir, "pdfs")
+    # Floating Action Button in bottom right
+    st.markdown("""
+    <a href="javascript:window.scrollTo(0,0);" class="fab-btn" title="Scroll to Top / Quick Action">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"/>
+            <polyline points="7 7 17 7 17 17"/>
+        </svg>
+    </a>
+    """, unsafe_allow_html=True)
+
+
+# =====================================================================
+# VIEW 2: PPT TO PDF (WITH HIGH-SPEED BULK 100+ FILES SUPPORT)
+# =====================================================================
+elif st.session_state.current_view == "ppt2pdf":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_ppt"):
+            switch_view("dashboard")
+
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
+        <div class="tool-icon-wrapper" style="margin: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+                <path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">PowerPoint to PDF Converter</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Convert single files or scan an entire folder of 100+ presentations in seconds.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    tab_bulk, tab_upload = st.tabs(["📁 Bulk Folder Mode (Fastest for 100+ Presentations)", "📤 Upload Files via Browser"])
+
+    with tab_bulk:
+        st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+        st.markdown("#### ⚡ Bulk Folder Converter")
+        st.caption("Point to any folder on your computer containing .ppt, .pptx, .pps, or .ppsx files.")
+
+        folder_input = st.text_input(
+            "Folder path on your computer:",
+            placeholder=r"C:\Users\username\Desktop\Presentations"
+        )
+        c_sub, c_out = st.columns(2)
+        with c_sub:
+            recursive_check = st.checkbox("Scan subfolders recursively", value=True)
+        with c_out:
+            dest_folder = st.text_input("Custom Output Directory (Leave empty to save alongside originals):", "")
+
+        if folder_input:
+            if os.path.isdir(folder_input):
+                found = find_presentation_files(folder_input, recursive=recursive_check)
+                st.success(f"✓ Found **{len(found)}** presentation file(s) in `{folder_input}`")
+
+                if found:
+                    with st.expander(f"View list of {len(found)} presentations"):
+                        for f in found[:40]:
+                            st.caption(f"• {f}")
+                        if len(found) > 40:
+                            st.caption(f"... and {len(found) - 40} more files.")
+
+                    if st.button(f"⚡ Start Bulk Conversion of {len(found)} Files", type="primary"):
+                        progress_bar = st.progress(0)
+                        status_lbl = st.empty()
+                        out_dir = dest_folder.strip() if dest_folder.strip() else None
+
+                        def cb(cur, tot, name, ok, msg):
+                            progress_bar.progress(cur / tot)
+                            status_lbl.markdown(f"**Converting [{cur}/{tot}]:** `{name}`")
+
+                        with st.spinner("Converting presentations with native PowerPoint engine..."):
+                            res = bulk_convert_ppt_to_pdf(found, output_dir=out_dir, progress_callback=cb)
+
+                        st.success(f"🎉 Completed! Successfully converted **{res['success']}** files ({res['failed']} failed).")
+                        save_recent_file(f"Batch ({res['success']} PPT files)", "PPT to PDF", 1024.0)
+
+                        if out_dir and os.path.isdir(out_dir):
+                            st.info(f"PDF files saved in: `{out_dir}`")
+            else:
+                st.warning("Specified path does not exist or is not a directory.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_upload:
+        st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+        st.markdown("#### 📤 Upload Files")
+        uploaded_ppts = st.file_uploader(
+            "Drag and drop PowerPoint files here:",
+            type=["pptx", "ppt", "pps", "ppsx"],
+            accept_multiple_files=True
+        )
+
+        if uploaded_ppts:
+            st.info(f"Selected **{len(uploaded_ppts)}** presentation(s).")
+            if st.button("⚡ Convert & Download ZIP", type="primary", key="btn_run_ppt_upload"):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    in_paths = []
+                    for uf in uploaded_ppts:
+                        p = os.path.join(temp_dir, uf.name)
+                        with open(p, "wb") as f:
+                            f.write(uf.getbuffer())
+                        in_paths.append(p)
+
+                    out_dir = os.path.join(temp_dir, "out_pdfs")
                     os.makedirs(out_dir, exist_ok=True)
 
-                    progress_bar = st.progress(0)
-                    status_text = st.empty()
+                    p_bar = st.progress(0)
+                    s_txt = st.empty()
 
-                    def cb(cur, tot, name, success, msg):
-                        progress_bar.progress(cur / tot)
-                        status_text.text(f"Converting [{cur}/{tot}]: {name}")
+                    def cb2(cur, tot, name, ok, msg):
+                        p_bar.progress(cur / tot)
+                        s_txt.text(f"Converting [{cur}/{tot}]: {name}")
 
-                    with st.spinner("Processing..."):
-                        res = bulk_convert_ppt_to_pdf(input_paths, output_dir=out_dir, progress_callback=cb)
+                    with st.spinner("Converting files..."):
+                        res = bulk_convert_ppt_to_pdf(in_paths, output_dir=out_dir, progress_callback=cb2)
 
-                    # Prepare ZIP download
                     files_dict = {}
-                    for res_item in res["results"]:
-                        if res_item["status"] == "success" and os.path.isfile(res_item["output"]):
-                            pdf_name = os.path.basename(res_item["output"])
-                            with open(res_item["output"], "rb") as pf:
-                                files_dict[pdf_name] = pf.read()
+                    for item in res["results"]:
+                        if item["status"] == "success" and os.path.isfile(item["output"]):
+                            with open(item["output"], "rb") as pf:
+                                files_dict[os.path.basename(item["output"])] = pf.read()
 
                     if files_dict:
-                        zip_data = get_zip_download(files_dict, "converted_pdfs.zip")
+                        zip_data = get_zip_bytes(files_dict)
+                        save_recent_file(uploaded_ppts[0].name, "PPT to PDF", len(zip_data) / 1024)
+                        st.success(f"🎉 Successfully converted {len(files_dict)} presentation(s)!")
                         st.download_button(
                             label="📥 Download Converted PDFs (.ZIP)",
                             data=zip_data,
@@ -193,122 +676,290 @@ if tool_choice == "📊 Bulk PPT to PDF":
                             type="primary"
                         )
                     else:
-                        st.error("No files could be converted.")
+                        st.error("Conversion failed. Please verify PowerPoint is available.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
 # =====================================================================
-# 2. MERGE PDFS
+# VIEW 3: MERGE PDF
 # =====================================================================
-elif tool_choice == "📑 Merge PDFs":
-    st.markdown('<div class="main-title">📑 Merge PDF Files</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Combine multiple PDF documents into a single file in any desired sequence.</div>', unsafe_allow_html=True)
+elif st.session_state.current_view == "merge":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_merge"):
+            switch_view("dashboard")
 
-    uploaded_pdfs = st.file_uploader("Select 2 or more PDF files to combine:", type=["pdf"], accept_multiple_files=True)
-    if uploaded_pdfs and len(uploaded_pdfs) >= 2:
-        st.write(f"**Files to merge ({len(uploaded_pdfs)}):**")
-        for i, up in enumerate(uploaded_pdfs, 1):
-            st.caption(f"{i}. {up.name} ({round(len(up.getvalue())/1024, 1)} KB)")
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
+        <div class="tool-icon-wrapper" style="margin: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/>
+                <path d="M14 2V7H19"/>
+                <path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Merge PDF Files</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Combine two or more PDF documents into a single document.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        if st.button("⚡ Merge PDFs Now", type="primary"):
+    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    uploaded_pdfs = st.file_uploader(
+        "Select PDF files to merge (order matters):",
+        type=["pdf"],
+        accept_multiple_files=True,
+        key="uploader_merge"
+    )
+
+    if uploaded_pdfs:
+        st.markdown(f"**Files ready to combine ({len(uploaded_pdfs)}):**")
+        for idx, f in enumerate(uploaded_pdfs, 1):
+            st.caption(f"{idx}. {f.name} ({round(len(f.getvalue()) / 1024, 1)} KB)")
+
+        if len(uploaded_pdfs) >= 2:
+            if st.button("⚡ Merge PDFs Now", type="primary", key="btn_run_merge"):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    in_paths = []
+                    for up in uploaded_pdfs:
+                        p = os.path.join(temp_dir, up.name)
+                        with open(p, "wb") as pf:
+                            pf.write(up.getbuffer())
+                        in_paths.append(p)
+
+                    out_merged = os.path.join(temp_dir, "merged_document.pdf")
+                    merge_pdfs(in_paths, out_merged)
+
+                    with open(out_merged, "rb") as mf:
+                        merged_bytes = mf.read()
+
+                    save_recent_file("merged_document.pdf", "Merge PDF", len(merged_bytes) / 1024)
+                    st.success("🎉 Merged successfully!")
+                    st.download_button(
+                        label="📥 Download Merged PDF",
+                        data=merged_bytes,
+                        file_name="merged_document.pdf",
+                        mime="application/pdf",
+                        type="primary"
+                    )
+        else:
+            st.warning("Please upload at least 2 PDF files to merge.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# =====================================================================
+# VIEW 4: SPLIT PDF
+# =====================================================================
+elif st.session_state.current_view == "split":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_split"):
+            switch_view("dashboard")
+
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
+        <div class="tool-icon-wrapper" style="margin: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
+                <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Split PDF</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Extract individual pages or custom page ranges into new documents.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    uploaded_pdf = st.file_uploader("Upload PDF file to split:", type=["pdf"], key="uploader_split")
+
+    if uploaded_pdf:
+        split_mode = st.radio("Splitting Strategy:", ["Split into individual pages (1 PDF per page)", "Extract custom page ranges (e.g. 1-3, 5)"])
+        range_val = ""
+        if "Extract" in split_mode:
+            range_val = st.text_input("Enter Page Ranges:", "1-3, 5")
+
+        if st.button("⚡ Split PDF Now", type="primary", key="btn_run_split"):
             with tempfile.TemporaryDirectory() as temp_dir:
-                paths = []
-                for up in uploaded_pdfs:
-                    p = os.path.join(temp_dir, up.name)
-                    with open(p, "wb") as f:
-                        f.write(up.getbuffer())
-                    paths.append(p)
+                in_path = os.path.join(temp_dir, uploaded_pdf.name)
+                with open(in_path, "wb") as f:
+                    f.write(uploaded_pdf.getbuffer())
 
-                out_merged = os.path.join(temp_dir, "merged_document.pdf")
-                merge_pdfs(paths, out_merged)
+                mode = "ranges" if "Extract" in split_mode else "all_pages"
+                out_dir = os.path.join(temp_dir, "split_results")
+                generated = split_pdf(in_path, out_dir, split_mode=mode, range_str=range_val)
 
-                with open(out_merged, "rb") as mf:
-                    merged_bytes = mf.read()
+                files_dict = {}
+                for g in generated:
+                    with open(g, "rb") as gf:
+                        files_dict[os.path.basename(g)] = gf.read()
 
-                st.success("✅ PDFs merged successfully!")
+                zip_data = get_zip_bytes(files_dict)
+                save_recent_file(uploaded_pdf.name, "Split PDF", len(zip_data) / 1024)
+                st.success(f"🎉 Generated {len(generated)} split PDF file(s)!")
                 st.download_button(
-                    label="📥 Download Merged PDF",
-                    data=merged_bytes,
-                    file_name="merged_document.pdf",
+                    label="📥 Download Split Pages (.ZIP)",
+                    data=zip_data,
+                    file_name="split_pages.zip",
+                    mime="application/zip",
+                    type="primary"
+                )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# =====================================================================
+# VIEW 5: COMPRESS PDF
+# =====================================================================
+elif st.session_state.current_view == "compress":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_comp"):
+            switch_view("dashboard")
+
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
+        <div class="tool-icon-wrapper" style="margin: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 14H10V20"/>
+                <path d="M10 14L3 21"/>
+                <path d="M20 10H14V4"/>
+                <path d="M14 10L21 3"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Compress PDF</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Shrink PDF file size while preserving high visual fidelity.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    uploaded_pdf = st.file_uploader("Upload PDF file to compress:", type=["pdf"], key="uploader_comp")
+
+    if uploaded_pdf:
+        orig_kb = round(len(uploaded_pdf.getvalue()) / 1024, 2)
+        st.info(f"Original File Size: **{orig_kb} KB** ({round(orig_kb / 1024, 2)} MB)")
+
+        if st.button("⚡ Compress PDF Now", type="primary", key="btn_run_comp"):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                in_path = os.path.join(temp_dir, uploaded_pdf.name)
+                out_path = os.path.join(temp_dir, "compressed.pdf")
+                with open(in_path, "wb") as f:
+                    f.write(uploaded_pdf.getbuffer())
+
+                with st.spinner("Optimizing PDF stream objects and images..."):
+                    res = compress_pdf(in_path, out_path)
+
+                with open(out_path, "rb") as cf:
+                    comp_bytes = cf.read()
+
+                save_recent_file(uploaded_pdf.name, "Compress PDF", res["compressed_size_kb"])
+                st.success(
+                    f"🎉 **Compression Complete!**\n\n"
+                    f"• **Original:** {res['original_size_kb']} KB\n"
+                    f"• **Compressed:** {res['compressed_size_kb']} KB\n"
+                    f"• **Saved:** {res['saved_kb']} KB ({res['percent_reduction']}% reduction)"
+                )
+                st.download_button(
+                    label="📥 Download Compressed PDF",
+                    data=comp_bytes,
+                    file_name=f"compressed_{uploaded_pdf.name}",
                     mime="application/pdf",
                     type="primary"
                 )
+    st.markdown('</div>', unsafe_allow_html=True)
+
 
 # =====================================================================
-# 3. SPLIT PDF
+# VIEW 6: PROTECT PDF
 # =====================================================================
-elif tool_choice == "✂️ Split PDF":
-    st.markdown('<div class="main-title">✂️ Split PDF</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Separate pages or extract specific page ranges from your PDF.</div>', unsafe_allow_html=True)
+elif st.session_state.current_view == "protect":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_protect"):
+            switch_view("dashboard")
 
-    uploaded_pdf = st.file_uploader("Upload PDF file to split:", type=["pdf"])
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
+        <div class="tool-icon-wrapper" style="margin: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Protect & Unlock PDF</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Add 128-bit password encryption or remove protection from your documents.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    sec_action = st.radio("Choose Action:", ["Encrypt & Set Password", "Decrypt & Remove Password"], horizontal=True)
+    uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="uploader_sec")
+
     if uploaded_pdf:
-        split_type = st.radio("Splitting Mode:", ["Split every page into a separate PDF", "Extract custom page ranges (e.g. 1-3, 5, 8-10)"])
-        range_input = ""
-        if "Extract" in split_type:
-            range_input = st.text_input("Enter Page Ranges:", "1-3, 5")
+        password = st.text_input("Enter Password:", type="password", key="sec_pwd")
+        if st.button("⚡ Process PDF", type="primary", key="btn_run_sec"):
+            if not password:
+                st.warning("Please enter a password.")
+            else:
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    in_path = os.path.join(temp_dir, uploaded_pdf.name)
+                    out_path = os.path.join(temp_dir, "result.pdf")
+                    with open(in_path, "wb") as f:
+                        f.write(uploaded_pdf.getbuffer())
 
-        if st.button("⚡ Split PDF", type="primary"):
-            with tempfile.TemporaryDirectory() as temp_dir:
-                in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                with open(in_pdf, "wb") as f:
-                    f.write(uploaded_pdf.getbuffer())
+                    if "Encrypt" in sec_action:
+                        protect_pdf(in_path, out_path, user_password=password)
+                        with open(out_path, "rb") as pf:
+                            p_bytes = pf.read()
+                        save_recent_file(f"protected_{uploaded_pdf.name}", "Protect PDF", len(p_bytes) / 1024)
+                        st.success("🎉 PDF encrypted and protected successfully!")
+                        st.download_button(
+                            label="📥 Download Protected PDF",
+                            data=p_bytes,
+                            file_name=f"protected_{uploaded_pdf.name}",
+                            mime="application/pdf",
+                            type="primary"
+                        )
+                    else:
+                        ok = unlock_pdf(in_path, out_path, password=password)
+                        if ok:
+                            with open(out_path, "rb") as pf:
+                                u_bytes = pf.read()
+                            save_recent_file(f"unlocked_{uploaded_pdf.name}", "Unlock PDF", len(u_bytes) / 1024)
+                            st.success("🎉 PDF unlocked successfully!")
+                            st.download_button(
+                                label="📥 Download Unlocked PDF",
+                                data=u_bytes,
+                                file_name=f"unlocked_{uploaded_pdf.name}",
+                                mime="application/pdf",
+                                type="primary"
+                            )
+                        else:
+                            st.error("❌ Incorrect password or decryption failed.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-                mode = "ranges" if "Extract" in split_type else "all_pages"
-                out_split_dir = os.path.join(temp_dir, "split_output")
-                results = split_pdf(in_pdf, out_split_dir, split_mode=mode, range_str=range_input)
-
-                files_dict = {}
-                for r in results:
-                    with open(r, "rb") as rf:
-                        files_dict[os.path.basename(r)] = rf.read()
-
-                st.success(f"✅ Generated {len(results)} split file(s)!")
-                zip_data = get_zip_download(files_dict, "split_pages.zip")
-                st.download_button("📥 Download Split Files (.ZIP)", data=zip_data, file_name="split_pages.zip", mime="application/zip", type="primary")
-
-# =====================================================================
-# 4. COMPRESS PDF
-# =====================================================================
-elif tool_choice == "🗜️ Compress PDF":
-    st.markdown('<div class="main-title">🗜️ Compress & Optimize PDF</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Reduce PDF file size while preserving high visual quality.</div>', unsafe_allow_html=True)
-
-    uploaded_pdf = st.file_uploader("Upload PDF to compress:", type=["pdf"])
-    if uploaded_pdf:
-        orig_kb = round(len(uploaded_pdf.getvalue()) / 1024, 2)
-        st.info(f"Original File Size: **{orig_kb} KB** ({round(orig_kb/1024, 2)} MB)")
-
-        if st.button("⚡ Compress PDF Now", type="primary"):
-            with tempfile.TemporaryDirectory() as temp_dir:
-                in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                out_pdf = os.path.join(temp_dir, "compressed.pdf")
-                with open(in_pdf, "wb") as f:
-                    f.write(uploaded_pdf.getbuffer())
-
-                with st.spinner("Optimizing streams and images..."):
-                    res = compress_pdf(in_pdf, out_pdf)
-
-                with open(out_pdf, "rb") as cf:
-                    comp_bytes = cf.read()
-
-                st.success(
-                    f"🎉 Compression Complete!\n\n"
-                    f"• **Before:** {res['original_size_kb']} KB\n"
-                    f"• **After:** {res['compressed_size_kb']} KB\n"
-                    f"• **Saved:** {res['saved_kb']} KB ({res['percent_reduction']}% reduction)"
-                )
-                st.download_button("📥 Download Compressed PDF", data=comp_bytes, file_name=f"compressed_{uploaded_pdf.name}", mime="application/pdf", type="primary")
 
 # =====================================================================
-# 5. IMAGES TO PDF
+# VIEW 7: MORE TOOLS (IMAGES, WATERMARK, TEXT, ROTATE)
 # =====================================================================
-elif tool_choice == "🖼️ Images to PDF":
-    st.markdown('<div class="main-title">🖼️ Images to PDF</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Convert JPG, PNG, WEBP, and BMP images into a clean PDF document.</div>', unsafe_allow_html=True)
+elif st.session_state.current_view == "more_tools":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard", key="back_from_more"):
+            switch_view("dashboard")
 
-    uploaded_imgs = st.file_uploader("Upload images to combine:", type=["jpg", "jpeg", "png", "webp", "bmp"], accept_multiple_files=True)
-    if uploaded_imgs:
-        st.write(f"Selected **{len(uploaded_imgs)}** image(s)")
-        if st.button("⚡ Convert Images to PDF", type="primary"):
+    st.markdown("## 🛠️ Additional PDF Master Tools")
+    t1, t2, t3, t4 = st.tabs(["🖼️ Images ↔ PDF", "💧 Add Watermark", "🔄 Rotate PDF", "📝 Extract Text"])
+
+    with t1:
+        st.markdown("#### Convert Images to PDF")
+        uploaded_imgs = st.file_uploader("Select JPG/PNG images:", type=["jpg", "png", "webp", "jpeg"], accept_multiple_files=True)
+        if uploaded_imgs and st.button("⚡ Combine Images to PDF", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
                 img_paths = []
                 for img in uploaded_imgs:
@@ -316,176 +967,102 @@ elif tool_choice == "🖼️ Images to PDF":
                     with open(ip, "wb") as f:
                         f.write(img.getbuffer())
                     img_paths.append(ip)
-
-                out_pdf = os.path.join(temp_dir, "images_combined.pdf")
+                out_pdf = os.path.join(temp_dir, "combined_images.pdf")
                 images_to_pdf(img_paths, out_pdf)
-
                 with open(out_pdf, "rb") as f:
-                    pdf_bytes = f.read()
+                    pdf_data = f.read()
+                st.success("✓ Combined PDF created!")
+                st.download_button("📥 Download PDF", pdf_data, file_name="images_combined.pdf", mime="application/pdf")
 
-                st.success("✅ Combined PDF generated successfully!")
-                st.download_button("📥 Download Combined PDF", data=pdf_bytes, file_name="images_combined.pdf", mime="application/pdf", type="primary")
-
-# =====================================================================
-# 6. PDF TO IMAGES
-# =====================================================================
-elif tool_choice == "📄 PDF to Images":
-    st.markdown('<div class="main-title">📄 PDF to Images</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Export PDF pages as high-resolution PNG or JPG image files.</div>', unsafe_allow_html=True)
-
-    uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"])
-    if uploaded_pdf:
-        c1, c2 = st.columns(2)
-        with c1:
-            img_format = st.selectbox("Image Format:", ["png", "jpg"])
-        with c2:
-            dpi = st.selectbox("Resolution (DPI):", [150, 200, 300, 72], index=0)
-
-        if st.button("⚡ Export Pages as Images", type="primary"):
+    with t2:
+        st.markdown("#### Apply Diagonal Watermark")
+        wm_pdf = st.file_uploader("Select PDF to watermark:", type=["pdf"], key="wm_uploader")
+        wm_txt = st.text_input("Watermark text:", "CONFIDENTIAL")
+        if wm_pdf and st.button("⚡ Apply Watermark", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
-                in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                with open(in_pdf, "wb") as f:
-                    f.write(uploaded_pdf.getbuffer())
+                in_p = os.path.join(temp_dir, wm_pdf.name)
+                out_p = os.path.join(temp_dir, "wm.pdf")
+                with open(in_p, "wb") as f:
+                    f.write(wm_pdf.getbuffer())
+                watermark_pdf(in_p, out_p, text=wm_txt)
+                with open(out_p, "rb") as f:
+                    st.download_button("📥 Download Watermarked PDF", f.read(), file_name=f"watermarked_{wm_pdf.name}", mime="application/pdf")
 
-                out_dir = os.path.join(temp_dir, "exported_imgs")
-                imgs = pdf_to_images(in_pdf, out_dir, dpi=dpi, img_format=img_format)
-
-                files_dict = {}
-                for im in imgs:
-                    with open(im, "rb") as imf:
-                        files_dict[os.path.basename(im)] = imf.read()
-
-                st.success(f"✅ Exported {len(imgs)} page(s) as images!")
-                zip_data = get_zip_download(files_dict, "pdf_pages_images.zip")
-                st.download_button("📥 Download Images (.ZIP)", data=zip_data, file_name="pdf_pages_images.zip", mime="application/zip", type="primary")
-
-# =====================================================================
-# 7. ADD WATERMARK
-# =====================================================================
-elif tool_choice == "💧 Add Watermark":
-    st.markdown('<div class="main-title">💧 Add Watermark</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Stamp custom text watermarks across every page of your PDF.</div>', unsafe_allow_html=True)
-
-    uploaded_pdf = st.file_uploader("Upload PDF:", type=["pdf"])
-    if uploaded_pdf:
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            wm_text = st.text_input("Watermark Text:", "CONFIDENTIAL")
-        with col2:
-            font_size = st.number_input("Font Size:", min_value=10, max_value=120, value=45)
-        with col3:
-            opacity = st.slider("Opacity:", min_value=0.05, max_value=0.8, value=0.22, step=0.05)
-
-        if st.button("⚡ Apply Watermark", type="primary"):
+    with t3:
+        st.markdown("#### Rotate PDF Pages")
+        rot_pdf = st.file_uploader("Select PDF to rotate:", type=["pdf"], key="rot_uploader")
+        rot_angle = st.selectbox("Angle:", [90, 180, 270], format_func=lambda a: f"{a}° Clockwise")
+        if rot_pdf and st.button("⚡ Rotate & Download", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
-                in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                out_pdf = os.path.join(temp_dir, "watermarked.pdf")
-                with open(in_pdf, "wb") as f:
-                    f.write(uploaded_pdf.getbuffer())
+                in_p = os.path.join(temp_dir, rot_pdf.name)
+                out_p = os.path.join(temp_dir, "rot.pdf")
+                with open(in_p, "wb") as f:
+                    f.write(rot_pdf.getbuffer())
+                rotate_pdf_pages(in_p, out_p, angle=rot_angle)
+                with open(out_p, "rb") as f:
+                    st.download_button("📥 Download Rotated PDF", f.read(), file_name=f"rotated_{rot_pdf.name}", mime="application/pdf")
 
-                watermark_pdf(in_pdf, out_pdf, text=wm_text, font_size=font_size, opacity=opacity)
-                with open(out_pdf, "rb") as wf:
-                    wm_bytes = wf.read()
-
-                st.success("✅ Watermark applied successfully!")
-                st.download_button("📥 Download Watermarked PDF", data=wm_bytes, file_name=f"watermarked_{uploaded_pdf.name}", mime="application/pdf", type="primary")
-
-# =====================================================================
-# 8. PROTECT / UNLOCK
-# =====================================================================
-elif tool_choice == "🔒 Protect / Unlock":
-    st.markdown('<div class="main-title">🔒 Protect & Unlock PDF</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Add 128-bit password encryption or remove passwords from protected PDFs.</div>', unsafe_allow_html=True)
-
-    action = st.radio("Action:", ["Encrypt / Protect with Password", "Decrypt / Remove Password"], horizontal=True)
-    uploaded_pdf = st.file_uploader("Upload PDF:", type=["pdf"])
-
-    if uploaded_pdf:
-        password = st.text_input("Enter Password:", type="password")
-        if st.button("⚡ Process PDF", type="primary"):
-            if not password:
-                st.warning("Please enter a password.")
-            else:
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                    out_pdf = os.path.join(temp_dir, "result.pdf")
-                    with open(in_pdf, "wb") as f:
-                        f.write(uploaded_pdf.getbuffer())
-
-                    if "Encrypt" in action:
-                        protect_pdf(in_pdf, out_pdf, user_password=password)
-                        st.success("✅ PDF encrypted and protected successfully!")
-                        with open(out_pdf, "rb") as f:
-                            st.download_button("📥 Download Protected PDF", data=f.read(), file_name=f"protected_{uploaded_pdf.name}", mime="application/pdf", type="primary")
-                    else:
-                        ok = unlock_pdf(in_pdf, out_pdf, password=password)
-                        if ok:
-                            st.success("✅ PDF unlocked and decrypted successfully!")
-                            with open(out_pdf, "rb") as f:
-                                st.download_button("📥 Download Unlocked PDF", data=f.read(), file_name=f"unlocked_{uploaded_pdf.name}", mime="application/pdf", type="primary")
-                        else:
-                            st.error("❌ Incorrect password or decryption failed.")
-
-# =====================================================================
-# 9. EXTRACT TEXT & IMAGES
-# =====================================================================
-elif tool_choice == "📝 Extract Text & Images":
-    st.markdown('<div class="main-title">📝 Extract Text & Embedded Images</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Extract readable text or dump all raw embedded photos and diagrams from your PDF.</div>', unsafe_allow_html=True)
-
-    uploaded_pdf = st.file_uploader("Upload PDF:", type=["pdf"])
-    if uploaded_pdf:
-        sub_tab1, sub_tab2 = st.tabs(["📄 Extract Text", "🖼️ Extract Embedded Images"])
-
-        with sub_tab1:
-            if st.button("⚡ Extract Text Now"):
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                    with open(in_pdf, "wb") as f:
-                        f.write(uploaded_pdf.getbuffer())
-                    extracted = extract_text_from_pdf(in_pdf)
-                    st.text_area("Extracted Content:", extracted, height=300)
-                    st.download_button("📥 Download as .txt", data=extracted, file_name=f"{os.path.splitext(uploaded_pdf.name)[0]}_text.txt", mime="text/plain")
-
-        with sub_tab2:
-            if st.button("⚡ Extract All Images"):
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                    with open(in_pdf, "wb") as f:
-                        f.write(uploaded_pdf.getbuffer())
-                    img_dir = os.path.join(temp_dir, "imgs")
-                    imgs = extract_embedded_images(in_pdf, img_dir)
-                    if imgs:
-                        files_dict = {}
-                        for im in imgs:
-                            with open(im, "rb") as imf:
-                                files_dict[os.path.basename(im)] = imf.read()
-                        st.success(f"Found {len(imgs)} embedded image(s)!")
-                        zip_data = get_zip_download(files_dict, "extracted_images.zip")
-                        st.download_button("📥 Download Extracted Images (.ZIP)", data=zip_data, file_name="extracted_images.zip", mime="application/zip")
-                    else:
-                        st.info("No embedded raster images found in this PDF.")
-
-# =====================================================================
-# 10. ROTATE PDF
-# =====================================================================
-elif tool_choice == "🔄 Rotate PDF":
-    st.markdown('<div class="main-title">🔄 Rotate PDF Pages</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Permanently rotate PDF orientation.</div>', unsafe_allow_html=True)
-
-    uploaded_pdf = st.file_uploader("Upload PDF to rotate:", type=["pdf"])
-    if uploaded_pdf:
-        angle = st.selectbox("Rotation Angle:", [90, 180, 270], format_func=lambda x: f"{x}° Clockwise")
-        if st.button("⚡ Rotate & Download", type="primary"):
+    with t4:
+        st.markdown("#### Extract Text")
+        txt_pdf = st.file_uploader("Select PDF to extract text from:", type=["pdf"], key="txt_uploader")
+        if txt_pdf and st.button("⚡ Extract Text Now", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
-                in_pdf = os.path.join(temp_dir, uploaded_pdf.name)
-                out_pdf = os.path.join(temp_dir, "rotated.pdf")
-                with open(in_pdf, "wb") as f:
-                    f.write(uploaded_pdf.getbuffer())
+                in_p = os.path.join(temp_dir, txt_pdf.name)
+                with open(in_p, "wb") as f:
+                    f.write(txt_pdf.getbuffer())
+                raw_text = extract_text_from_pdf(in_p)
+                st.text_area("Extracted Content:", raw_text, height=260)
+                st.download_button("📥 Download .txt", raw_text, file_name=f"{txt_pdf.name}.txt")
 
-                rotate_pdf_pages(in_pdf, out_pdf, angle=angle)
-                with open(out_pdf, "rb") as rf:
-                    rot_bytes = rf.read()
 
-                st.success("✅ PDF rotated successfully!")
-                st.download_button("📥 Download Rotated PDF", data=rot_bytes, file_name=f"rotated_{uploaded_pdf.name}", mime="application/pdf", type="primary")
+# =====================================================================
+# VIEW 8: RECENT FILES FULL VIEW
+# =====================================================================
+elif st.session_state.current_view == "recent_view":
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard"):
+            switch_view("dashboard")
+
+    st.markdown("## 🕒 Recent Processed Files")
+    recent_list = load_recent_files()
+    if recent_list:
+        for item in recent_list:
+            st.markdown(f"""
+            <div style="background: #FFFFFF; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-weight: 700; color: #111827;">{item['filename']}</span>
+                    <span style="background: #FFF0EB; color: #FF5A36; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-left: 10px;">{item['tool']}</span>
+                    <div style="color: #64748B; font-size: 0.8rem; margin-top: 4px;">Size: {item['size_kb']} KB</div>
+                </div>
+                <div style="color: #94A3B8; font-size: 0.82rem;">{item.get('timestamp', '')}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No recent files logged yet.")
+
+
+# =====================================================================
+# VIEW 9: SETTINGS & HELP
+# =====================================================================
+elif st.session_state.current_view in ("settings_view", "help_view"):
+    c_back, _ = st.columns([2, 8])
+    with c_back:
+        if st.button("← Back to Dashboard"):
+            switch_view("dashboard")
+
+    if st.session_state.current_view == "settings_view":
+        st.markdown("## ⚙️ Application Settings")
+        st.markdown("""
+        - **Engine:** Native Microsoft PowerPoint COM + PyMuPDF + PyPDF
+        - **Execution Mode:** 100% Offline & Local
+        - **Temporary Storage:** Automatically sanitized upon task completion
+        """)
+    else:
+        st.markdown("## ❓ Help & Documentation")
+        st.markdown("""
+        **Quick Tips:**
+        1. **Bulk PPT to PDF:** Use the **Bulk Folder Mode** when you have 100+ presentations. It avoids browser upload limits and runs at native speed.
+        2. **Merge PDFs:** Drag & drop PDFs in the order you want them combined.
+        3. **Compress PDF:** PyMuPDF optimizes object streams and downsamples large embedded photos without visible quality degradation.
+        """)

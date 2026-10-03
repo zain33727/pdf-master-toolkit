@@ -79,47 +79,51 @@ class PDFMasterApp(tk.Tk):
         if "clam" in available_themes:
             self.style.theme_use("clam")
 
-        self.configure(bg="#F4F6F9")
+        self.configure(bg="#FBFBFC")
 
         # Fonts
-        self.font_title = ("Segoe UI", 13, "bold")
-        self.font_heading = ("Segoe UI", 11, "bold")
+        self.font_title = ("Segoe UI", 12, "bold")
+        self.font_heading = ("Segoe UI", 10, "bold")
         self.font_body = ("Segoe UI", 10)
         self.font_mono = ("Consolas", 9)
 
         # Custom ttk styles
-        self.style.configure("TNotebook", background="#F4F6F9")
-        self.style.configure("TNotebook.Tab", font=("Segoe UI", 10, "bold"), padding=[10, 6])
-        self.style.configure("TFrame", background="#F4F6F9")
+        self.style.configure("TNotebook", background="#FBFBFC")
+        self.style.configure("TNotebook.Tab", font=("Segoe UI", 10, "bold"), padding=[12, 6])
+        self.style.map("TNotebook.Tab", background=[("selected", "#FFFFFF")])
+        self.style.configure("TFrame", background="#FBFBFC")
         self.style.configure("Card.TFrame", background="#FFFFFF", relief="solid", borderwidth=1)
-        self.style.configure("TLabel", background="#F4F6F9", font=self.font_body)
+        self.style.configure("TLabel", background="#FBFBFC", font=self.font_body, foreground="#1E293B")
         self.style.configure("Card.TLabel", background="#FFFFFF", font=self.font_body)
-        self.style.configure("Heading.TLabel", font=self.font_heading, background="#F4F6F9", foreground="#1E293B")
-        self.style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"), padding=6)
-        self.style.configure("Action.TButton", font=("Segoe UI", 10), padding=4)
+        self.style.configure("Heading.TLabel", font=self.font_heading, background="#FBFBFC", foreground="#111827")
+        self.style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"), background="#FF5A36", foreground="#FFFFFF", padding=6)
+        self.style.map("Primary.TButton", background=[("active", "#E64724"), ("pressed", "#CC3B1A")])
+        self.style.configure("Action.TButton", font=("Segoe UI", 9), padding=4)
 
     def _build_header(self):
-        header_frame = tk.Frame(self, bg="#1E3A8A", height=55)
-        header_frame.pack(fill=tk.X, side=tk.TOP)
+        header_frame = tk.Frame(self, bg="#FFFFFF", height=58, highlightbackground="#ECEEF1", highlightthickness=1)
+        header_frame.pack(fill=tk.X, side=tk.TOP, pady=(0, 10))
         header_frame.pack_propagate(False)
 
-        title_lbl = tk.Label(
+        badge_lbl = tk.Label(
             header_frame,
-            text="⚡ PDF Master Toolkit",
-            font=("Segoe UI", 14, "bold"),
+            text="DOCUMENT AUTOMATION",
+            font=("Segoe UI", 8, "bold"),
             fg="#FFFFFF",
-            bg="#1E3A8A"
+            bg="#18181B",
+            padx=8,
+            pady=3
         )
-        title_lbl.pack(side=tk.LEFT, padx=16, pady=8)
+        badge_lbl.pack(side=tk.LEFT, padx=(16, 12), pady=12)
 
         sub_lbl = tk.Label(
             header_frame,
-            text="Bulk PPT to PDF • Merge • Split • Compress • Images • Watermark • 100% Offline",
-            font=("Segoe UI", 9),
-            fg="#93C5FD",
-            bg="#1E3A8A"
+            text="Five powerful tools. One reliable workspace. • 100% Offline",
+            font=("Segoe UI", 10),
+            fg="#64748B",
+            bg="#FFFFFF"
         )
-        sub_lbl.pack(side=tk.LEFT, padx=8, pady=8)
+        sub_lbl.pack(side=tk.LEFT, padx=0, pady=12)
 
     # -------------------------------------------------------------
     # TAB 1: BULK PPT TO PDF
