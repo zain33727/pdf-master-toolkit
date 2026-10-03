@@ -212,10 +212,10 @@ st.markdown("""
     }
     [data-testid="stSidebarCollapseButton"] button:hover,
     [data-testid="collapsedControl"] button:hover {
-        background: #FFF0EB !important;
-        color: #FF5A36 !important;
-        border-color: #FFD2C7 !important;
-        transform: scale(1.04) !important;
+        background: #F1F5F9 !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+        transform: scale(1.02) !important;
     }
 
     /* Position the reopen toggle cleanly at top-left */
@@ -279,7 +279,7 @@ st.markdown("""
         width: 100% !important;
         height: 42px !important;
         padding: 0 14px !important;
-        border: none !important;
+        border: 1px solid transparent !important;
         border-radius: 10px !important;
         font-size: 0.92rem !important;
         font-weight: 500 !important;
@@ -288,18 +288,28 @@ st.markdown("""
         white-space: nowrap !important;
         box-shadow: none !important;
         margin-bottom: 4px !important;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
+    /* Sleek, calm, premium neutral hover - no loud jarring red text */
     [data-testid="stSidebar"] .stButton > button:hover {
-        background-color: #F8FAFC !important;
-        color: #FF5A36 !important;
-        transform: translateX(3px);
+        background-color: #F1F5F9 !important;
+        color: #0F172A !important;
+        font-weight: 600 !important;
+        border-color: #E2E8F0 !important;
+        transform: translateX(2px) !important;
     }
+    /* Active Link - Clean subtle coral pill with soft highlight */
     [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background-color: #FFF0EB !important;
+        background-color: #FFF2ED !important;
         color: #FF5A36 !important;
         font-weight: 700 !important;
-        box-shadow: 0 2px 6px rgba(255, 90, 54, 0.1) !important;
+        border-color: #FFDCD3 !important;
+        box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+        background-color: #FFEAE2 !important;
+        color: #E64724 !important;
+        border-color: #FFCFC2 !important;
     }
 
     /* Main Container */
