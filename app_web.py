@@ -116,6 +116,10 @@ st.markdown("""
         box-shadow: none !important;
         pointer-events: none !important;
     }
+    header [data-testid="stExpandSidebarButton"],
+    header [data-testid="collapsedControl"] {
+        pointer-events: auto !important;
+    }
 
     /* Ambient Floating Blurred PDF Elements in Background */
     .ambient-motion-bg {
@@ -217,24 +221,9 @@ st.markdown("""
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
         transition: all 0.2s ease !important;
     }
-    [data-testid="stSidebarCollapseButton"] button:hover,
-    [data-testid="collapsedControl"] button:hover {
-        background: #F1F5F9 !important;
-        color: #0F172A !important;
-        border-color: #CBD5E1 !important;
-        transform: scale(1.02) !important;
-    }
-
-    /* Position the reopen toggle cleanly at top-left */
-    [data-testid="collapsedControl"] {
-        display: block !important;
-        position: fixed !important;
-        top: 14px !important;
-        left: 14px !important;
-        z-index: 999999 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-    }
+    /* Modern Sleek Collapse & Expand Toggle Buttons */
+    [data-testid="stSidebarCollapseButton"] button,
+    [data-testid="stExpandSidebarButton"] button,
     [data-testid="collapsedControl"] button {
         background: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
@@ -250,12 +239,27 @@ st.markdown("""
         pointer-events: auto !important;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
+    [data-testid="stSidebarCollapseButton"] button:hover,
+    [data-testid="stExpandSidebarButton"] button:hover,
     [data-testid="collapsedControl"] button:hover {
         background: #F1F5F9 !important;
         color: #0F172A !important;
         border-color: #CBD5E1 !important;
         transform: scale(1.05) !important;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    /* Position the reopen toggle cleanly at top-left */
+    [data-testid="stExpandSidebarButton"],
+    [data-testid="collapsedControl"] {
+        display: block !important;
+        position: fixed !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 999999 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     [data-testid="stSidebar"] .block-container {
         padding-top: 1.5rem !important;
