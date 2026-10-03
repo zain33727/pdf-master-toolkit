@@ -8,7 +8,7 @@ import io
 import os
 import pymupdf as fitz
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple, Union
+from typing import List, Dict, Optional, Tuple, Union, Any
 from pypdf import PdfReader, PdfWriter, Transformation
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -388,3 +388,197 @@ def unlock_pdf(input_path: str, output_path: str, password: str) -> bool:
         writer.write(f)
 
     return True
+
+
+def remove_watermark_from_pdf(
+    input_path: str,
+    output_path: str,
+    watermark_text: Optional[str] = None,
+    remove_annotations: bool = True,
+    remove_background_images: bool = False
+) -> Dict[str, Union[int, bool]]:
+    """
+    Remove watermarks from PDF:
+    - Text-based watermarks: searches for specific text strings and redacts them cleanly.
+    - Annotation-based watermarks: removes stamp, text, or overlay annotations.
+    - Image-based watermarks: identifies and strips full-page image overlays.
+    """
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    doc = fitz.open(input_path)
+    text_matches_removed = 0
+    annotations_removed = 0
+    images_removed = 0
+
+    for page in doc:
+        # 1. Remove text watermark if text query specified
+        if watermark_text and watermark_text.strip():
+            rects = page.search_for(watermark_text.strip(), quads=False)
+            for r in rects:
+                page.add_redact_annot(r, fill=None)
+                text_matches_removed += 1
+            if rects:
+                page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+
+        # 2. Remove watermark annotations (Stamps, Watermarks, FreeText)
+        if remove_annotations:
+            annots = list(page.annots()) if page.annots() else []
+            for annot in annots:
+                page.delete_annot(annot)
+                annotations_removed += 1
+
+        # 3. Remove background image watermarks if requested
+        if remove_background_images:
+            page_rect = page.rect
+            img_list = page.get_images(full=True)
+            for img in img_list:
+                xref = img[0]
+                rects = page.get_image_rects(xref)
+                for r in rects:
+                    if (r.width * r.height) >= (page_rect.width * page_rect.height * 0.75):
+                        page.delete_image(xref)
+                        images_removed += 1
+                        break
+
+    doc.save(output_path, clean=True, deflate=True)
+    doc.close()
+
+    return {
+        "success": True,
+        "text_removed": text_matches_removed,
+        "annotations_removed": annotations_removed,
+        "images_removed": images_removed,
+        "total_removed": text_matches_removed + annotations_removed + images_removed
+    }
+
+
+def csv_or_excel_to_pdf(
+    input_file_path: str,
+    output_pdf_path: str,
+    title: str = "Spreadsheet Report",
+    orientation: str = "landscape",
+    max_rows: int = 1500
+) -> str:
+    """
+    Convert CSV or Excel spreadsheet into a publication-quality styled PDF report.
+    """
+    import pandas as pd
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+
+    os.makedirs(os.path.dirname(os.path.abspath(output_pdf_path)), exist_ok=True)
+
+    ext = os.path.splitext(input_file_path)[1].lower()
+    if ext == ".csv":
+        df = pd.read_csv(input_file_path, nrows=max_rows)
+    else:
+        df = pd.read_excel(input_file_path, nrows=max_rows)
+
+    df = df.fillna("")
+
+    page_size = landscape(letter) if orientation == "landscape" else letter
+    doc = SimpleDocTemplate(
+        output_pdf_path,
+        pagesize=page_size,
+        leftMargin=36,
+        rightMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'SpreadsheetTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=18,
+        leading=22,
+        textColor=colors.HexColor('#0F172A'),
+        spaceAfter=6
+    )
+    sub_style = ParagraphStyle(
+        'SpreadsheetSub',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        textColor=colors.HexColor('#64748B'),
+        spaceAfter=14
+    )
+
+    elements = [
+        Paragraph(title, title_style),
+        Paragraph(f"Generated from {os.path.basename(input_file_path)} • {len(df)} rows × {len(df.columns)} columns", sub_style),
+        Spacer(1, 4)
+    ]
+
+    data = [list(df.columns)] + df.astype(str).values.tolist()
+    t = Table(data, repeatRows=1)
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#FF5A36')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 7),
+        ('TOPPADDING', (0, 0), (-1, 0), 7),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F8FAFC')]),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#E2E8F0')),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('PADDING', (0, 0), (-1, -1), 5),
+    ]))
+    elements.append(t)
+    doc.build(elements)
+
+    return output_pdf_path
+
+
+def pdf_to_excel_or_csv(
+    input_pdf_path: str,
+    output_path: str,
+    format_type: str = "xlsx"
+) -> Dict[str, Any]:
+    """
+    Extract all tables from a PDF document and save to Excel (.xlsx) or CSV.
+    """
+    import pandas as pd
+
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    doc = fitz.open(input_pdf_path)
+    all_tables = []
+
+    for page_idx, page in enumerate(doc, start=1):
+        tabs = page.find_tables()
+        for t_idx, tab in enumerate(tabs, start=1):
+            df_rows = tab.extract()
+            if df_rows:
+                headers = df_rows[0]
+                rows = df_rows[1:]
+                clean_headers = [str(h).strip() if h else f"Col_{c}" for c, h in enumerate(headers)]
+                t_df = pd.DataFrame(rows, columns=clean_headers)
+                all_tables.append({
+                    "page": page_idx,
+                    "table_num": t_idx,
+                    "df": t_df
+                })
+
+    doc.close()
+
+    if not all_tables:
+        return {"success": False, "tables_found": 0, "output": None}
+
+    if format_type.lower() == "xlsx":
+        with pd.ExcelWriter(output_path, engine="xlsxwriter") as writer:
+            for i, tbl in enumerate(all_tables, start=1):
+                sheet_name = f"Page{tbl['page']}_T{tbl['table_num']}"[:31]
+                tbl["df"].to_excel(writer, sheet_name=sheet_name, index=False)
+    else:
+        combined = pd.concat([t["df"] for t in all_tables], ignore_index=True)
+        combined.to_csv(output_path, index=False, encoding="utf-8")
+
+    return {
+        "success": True,
+        "tables_found": len(all_tables),
+        "output": output_path
+    }

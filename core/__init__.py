@@ -23,7 +23,10 @@ from .pdf_ops import (
     watermark_pdf,
     protect_pdf,
     unlock_pdf,
-    get_pdf_info
+    get_pdf_info,
+    remove_watermark_from_pdf,
+    csv_or_excel_to_pdf,
+    pdf_to_excel_or_csv
 )
 
 __all__ = [
@@ -44,5 +47,8 @@ __all__ = [
     "watermark_pdf",
     "protect_pdf",
     "unlock_pdf",
-    "get_pdf_info"
+    "get_pdf_info",
+    "remove_watermark_from_pdf",
+    "csv_or_excel_to_pdf",
+    "pdf_to_excel_or_csv"
 ]

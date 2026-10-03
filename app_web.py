@@ -28,7 +28,10 @@ from core import (
     watermark_pdf,
     protect_pdf,
     unlock_pdf,
-    get_pdf_info
+    get_pdf_info,
+    remove_watermark_from_pdf,
+    csv_or_excel_to_pdf,
+    pdf_to_excel_or_csv
 )
 
 st.set_page_config(
@@ -102,23 +105,14 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
 
-    #MainMenu, footer, [data-testid="stDecoration"], [data-testid="stToolbar"], [data-testid="stStatusWidget"] {
+    #MainMenu, footer, [data-testid="stDecoration"], [data-testid="stHeaderActionElements"], [data-testid="stStatusWidget"] {
         display: none !important;
     }
 
-    header, [data-testid="stHeader"] {
+    header, [data-testid="stHeader"], [data-testid="stToolbar"] {
         background: transparent !important;
-        height: 0px !important;
-        min-height: 0px !important;
-        padding: 0 !important;
-        margin: 0 !important;
         border: none !important;
         box-shadow: none !important;
-        pointer-events: none !important;
-    }
-    header [data-testid="stExpandSidebarButton"],
-    header [data-testid="collapsedControl"] {
-        pointer-events: auto !important;
     }
 
     /* Ambient Floating Blurred PDF Elements in Background */
@@ -375,7 +369,8 @@ st.markdown("""
     .st-key-btn_c_ppt, .st-key-btn_c_merge, .st-key-btn_c_split,
     .st-key-btn_c_comp, .st-key-btn_c_word, .st-key-btn_c_i2p,
     .st-key-btn_c_p2i, .st-key-btn_c_wm, .st-key-btn_c_sec,
-    .st-key-btn_c_ext, .st-key-btn_c_rot {
+    .st-key-btn_c_ext, .st-key-btn_c_rot, .st-key-btn_c_rmwm,
+    .st-key-btn_c_c2p, .st-key-btn_c_p2e {
         margin-top: auto;
     }
 
@@ -974,6 +969,64 @@ if st.session_state.current_view == "dashboard":
             st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
     with r4c3:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20H4"/>
+                    <path d="M4 4l16 16"/>
+                    <circle cx="12" cy="12" r="9"/>
+                </svg>
+            </div>
+            <div class="card-title">Remove Watermark</div>
+            <div class="card-desc">Erase text watermarks and background overlay stamps cleanly.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_c_rmwm", type="primary"):
+                switch_view("remove_watermark")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+
+    # ROW 5: CSV to PDF, PDF to Excel/CSV
+    r5c1, r5c2, r5c3 = st.columns(3, gap="medium")
+
+    with r5c1:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M8 13h8M8 17h8"/>
+                </svg>
+            </div>
+            <div class="card-title">CSV / Sheets to PDF</div>
+            <div class="card-desc">Convert CSV or Google Sheets exports into styled, printable PDF tables.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select Spreadsheet", key="btn_c_c2p", type="primary"):
+                switch_view("csv2pdf")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
+
+    with r5c2:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="3" y1="15" x2="21" y2="15"/>
+                    <line x1="9" y1="3" x2="9" y2="21"/>
+                    <line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+            </div>
+            <div class="card-title">PDF to Excel & CSV</div>
+            <div class="card-desc">Extract tabular data from PDF into clean .xlsx or Google Sheets CSV.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_c_p2e", type="primary"):
+                switch_view("pdf2sheet")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
+
+    with r5c3:
         pass
 
     # Recent Files Preview at Bottom of Dashboard
@@ -1594,6 +1647,166 @@ elif st.session_state.current_view == "recent_view":
                 <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 500;">{item.get('timestamp', '')}</div>
             </div>
             """, unsafe_allow_html=True)
+    end_unified_workspace()
+
+
+# =====================================================================
+# VIEW 11: REMOVE WATERMARK (UNIFIED WORKSPACE)
+# =====================================================================
+elif st.session_state.current_view == "remove_watermark":
+    begin_unified_workspace(
+        "Remove Watermark from PDF",
+        "Erase text watermarks and background overlay stamps cleanly from your documents.",
+        '<path d="M20 20H4"/><path d="M4 4l16 16"/><circle cx="12" cy="12" r="9"/>'
+    )
+
+    uploaded_pdf = st.file_uploader("Upload PDF with watermark to clean:", type=["pdf"], key="up_rmwm")
+
+    if uploaded_pdf:
+        c1, c2 = st.columns(2, gap="medium")
+        with c1:
+            wm_text = st.text_input("Watermark text to remove (e.g. CONFIDENTIAL, DRAFT):", placeholder="Enter exact word or phrase")
+        with c2:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            rm_annots = st.checkbox("Strip stamp & watermark annotations", value=True)
+            rm_bg = st.checkbox("Remove full-page background watermark images", value=False)
+
+        if st.button("⚡ Clean Watermark Now", type="primary", key="btn_run_rmwm"):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                in_path = os.path.join(temp_dir, uploaded_pdf.name)
+                with open(in_path, "wb") as f:
+                    f.write(uploaded_pdf.getbuffer())
+
+                out_cleaned = os.path.join(temp_dir, f"cleaned_{uploaded_pdf.name}")
+                with st.spinner("Analyzing document and scrubbing watermark layers..."):
+                    res = remove_watermark_from_pdf(
+                        in_path,
+                        out_cleaned,
+                        watermark_text=wm_text if wm_text.strip() else None,
+                        remove_annotations=rm_annots,
+                        remove_background_images=rm_bg
+                    )
+
+                with open(out_cleaned, "rb") as cf:
+                    cleaned_bytes = cf.read()
+
+                save_recent_file(f"cleaned_{uploaded_pdf.name}", "Remove Watermark", len(cleaned_bytes) / 1024)
+                st.success(f"🎉 Watermark scrubbed! Removed {res['total_removed']} watermark element(s).")
+                st.download_button(
+                    label="📥 Download Cleaned PDF",
+                    data=cleaned_bytes,
+                    file_name=f"cleaned_{uploaded_pdf.name}",
+                    mime="application/pdf",
+                    type="primary"
+                )
+    end_unified_workspace()
+
+
+# =====================================================================
+# VIEW 12: CSV / EXCEL TO PDF (UNIFIED WORKSPACE)
+# =====================================================================
+elif st.session_state.current_view == "csv2pdf":
+    begin_unified_workspace(
+        "CSV & Sheets to PDF",
+        "Convert CSV or Google Sheets/Excel exports into styled, publication-ready PDF tables.",
+        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h8"/>'
+    )
+
+    uploaded_sheet = st.file_uploader("Upload CSV or Excel file:", type=["csv", "xlsx", "xls"], key="up_csv2pdf")
+
+    if uploaded_sheet:
+        c1, c2 = st.columns(2, gap="medium")
+        with c1:
+            report_title = st.text_input("PDF Report Title:", value="Spreadsheet Report")
+        with c2:
+            orientation = st.selectbox("Page Orientation:", ["Landscape (Recommended for wide tables)", "Portrait"])
+
+        import pandas as pd
+        with tempfile.TemporaryDirectory() as temp_dir:
+            sheet_path = os.path.join(temp_dir, uploaded_sheet.name)
+            with open(sheet_path, "wb") as f:
+                f.write(uploaded_sheet.getbuffer())
+
+            try:
+                if uploaded_sheet.name.lower().endswith(".csv"):
+                    preview_df = pd.read_csv(sheet_path, nrows=5)
+                else:
+                    preview_df = pd.read_excel(sheet_path, nrows=5)
+
+                with st.expander("👁️ Preview First 5 Rows of Data", expanded=True):
+                    st.dataframe(preview_df, use_container_width=True)
+            except Exception as e:
+                st.caption(f"Could not preview: {e}")
+
+        if st.button("⚡ Convert to Styled PDF", type="primary", key="btn_run_csv2pdf"):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                sheet_path = os.path.join(temp_dir, uploaded_sheet.name)
+                with open(sheet_path, "wb") as f:
+                    f.write(uploaded_sheet.getbuffer())
+
+                out_pdf = os.path.join(temp_dir, "report.pdf")
+                orient = "landscape" if "Landscape" in orientation else "portrait"
+                csv_or_excel_to_pdf(sheet_path, out_pdf, title=report_title, orientation=orient)
+
+                with open(out_pdf, "rb") as pf:
+                    pdf_bytes = pf.read()
+
+                save_recent_file(f"{os.path.splitext(uploaded_sheet.name)[0]}.pdf", "CSV to PDF", len(pdf_bytes) / 1024)
+                st.success("🎉 PDF Report generated successfully!")
+                st.download_button(
+                    label="📥 Download Generated PDF Report",
+                    data=pdf_bytes,
+                    file_name=f"{os.path.splitext(uploaded_sheet.name)[0]}.pdf",
+                    mime="application/pdf",
+                    type="primary"
+                )
+    end_unified_workspace()
+
+
+# =====================================================================
+# VIEW 13: PDF TO EXCEL & CSV (UNIFIED WORKSPACE)
+# =====================================================================
+elif st.session_state.current_view == "pdf2sheet":
+    begin_unified_workspace(
+        "PDF to Excel & CSV",
+        "Automatically extract tabular data from PDF into clean .xlsx or Google Sheets CSV.",
+        '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>'
+    )
+
+    uploaded_pdf = st.file_uploader("Upload PDF containing tables:", type=["pdf"], key="up_pdf2sheet")
+
+    if uploaded_pdf:
+        export_format = st.radio("Export Format:", ["Excel Spreadsheet (.xlsx)", "Google Sheets Compatible CSV (.csv)"], horizontal=True)
+
+        if st.button("⚡ Extract Tables Now", type="primary", key="btn_run_pdf2sheet"):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                in_path = os.path.join(temp_dir, uploaded_pdf.name)
+                with open(in_path, "wb") as f:
+                    f.write(uploaded_pdf.getbuffer())
+
+                fmt = "xlsx" if "Excel" in export_format else "csv"
+                ext = ".xlsx" if fmt == "xlsx" else ".csv"
+                out_path = os.path.join(temp_dir, f"extracted_tables{ext}")
+
+                with st.spinner("Scanning pages and analyzing table structures..."):
+                    res = pdf_to_excel_or_csv(in_path, out_path, format_type=fmt)
+
+                if res["success"]:
+                    with open(out_path, "rb") as f:
+                        file_bytes = f.read()
+
+                    mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" if fmt == "xlsx" else "text/csv"
+                    save_recent_file(f"tables_{uploaded_pdf.name}{ext}", "PDF to Sheet", len(file_bytes) / 1024)
+                    st.success(f"🎉 Found and extracted **{res['tables_found']}** table(s) successfully!")
+                    st.download_button(
+                        label=f"📥 Download Extracted {fmt.upper()} Spreadsheet",
+                        data=file_bytes,
+                        file_name=f"{os.path.splitext(uploaded_pdf.name)[0]}_tables{ext}",
+                        mime=mime,
+                        type="primary"
+                    )
+                else:
+                    st.warning("No structured tables were detected in this PDF. If the PDF is a scanned image, try our Extract Content tool.")
     end_unified_workspace()
 
 
