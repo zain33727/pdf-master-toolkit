@@ -1,6 +1,6 @@
 """
 PDF Master Toolkit - All-in-One Offline Suite
-Featuring all 10 core tools in the modern card grid & sidebar design.
+Clean modern UI with wide sidebar, sleek icons, and unified tool workspaces.
 """
 
 import os
@@ -81,7 +81,7 @@ def get_zip_bytes(files_dict: dict):
 if "current_view" not in st.session_state:
     st.session_state.current_view = "dashboard"
 
-# Custom Styling (Light Theme, Coral Accents, Unified Cards)
+# Complete CSS Overrides for a Premium SaaS Look & Feel
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -96,55 +96,68 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    .block-container {
-        padding-top: 1.8rem !important;
-        padding-bottom: 3rem !important;
-        padding-left: 2.2rem !important;
-        padding-right: 2.2rem !important;
-        max-width: 1360px !important;
-        background-color: #F8F9FA !important;
-    }
-
-    /* Sidebar Styling */
-    [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+    /* Sidebar Width: Wide enough so text NEVER wraps awkwardly */
+    [data-testid="stSidebar"], section[data-testid="stSidebar"] {
+        min-width: 275px !important;
+        max-width: 275px !important;
+        width: 275px !important;
         background-color: #FFFFFF !important;
-        border-right: 1px solid #ECEEF1 !important;
+        border-right: 1px solid #EAEBEF !important;
     }
     [data-testid="stSidebar"] .block-container {
-        padding-top: 1.4rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-top: 1.5rem !important;
+        padding-left: 1.1rem !important;
+        padding-right: 1.1rem !important;
         background-color: #FFFFFF !important;
     }
 
-    /* Brand Badge in Sidebar */
-    .sidebar-brand-badge {
-        display: inline-block;
+    /* Brand Header in Sidebar */
+    .sidebar-brand-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 4px 18px 4px;
+        border-bottom: 1px solid #F1F5F9;
+        margin-bottom: 14px;
+    }
+    .brand-icon-sq {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
         background-color: #18181B;
         color: #FFFFFF;
-        font-size: 0.72rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 6px 12px;
-        border-radius: 6px;
-        margin-bottom: 1.2rem;
+        font-size: 1rem;
+    }
+    .brand-title-text {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0F172A;
+        letter-spacing: -0.01em;
     }
 
-    /* Sidebar Buttons */
+    /* Sleek Sidebar Nav Links */
     [data-testid="stSidebar"] .stButton > button {
-        background: transparent !important;
-        border: none !important;
-        color: #475569 !important;
-        text-align: left !important;
+        display: flex !important;
+        align-items: center !important;
         justify-content: flex-start !important;
-        padding: 8px 12px !important;
-        font-weight: 500 !important;
-        font-size: 0.9rem !important;
-        border-radius: 6px !important;
-        box-shadow: none !important;
         width: 100% !important;
-        margin-bottom: 1px !important;
+        height: 40px !important;
+        padding: 0 12px !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 0.88rem !important;
+        font-weight: 500 !important;
+        color: #475569 !important;
+        background: transparent !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        box-shadow: none !important;
+        margin-bottom: 2px !important;
         transition: all 0.15s ease !important;
     }
     [data-testid="stSidebar"] .stButton > button:hover {
@@ -157,28 +170,39 @@ st.markdown("""
         font-weight: 700 !important;
     }
 
+    /* Main Container */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 3.5rem !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
+        max-width: 1300px !important;
+        background-color: #F8F9FA !important;
+    }
+
     /* Dashboard Header */
     .dash-header-title {
-        font-size: 1.75rem;
+        font-size: 1.85rem;
         font-weight: 700;
         color: #111827;
         margin-bottom: 4px;
+        letter-spacing: -0.02em;
     }
     .dash-header-sub {
         font-size: 0.95rem;
         color: #64748B;
-        margin-bottom: 22px;
+        margin-bottom: 24px;
     }
 
-    /* Card Containers */
+    /* Dashboard Card Containers */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
         border: 1px solid #EAEBEF !important;
         border-radius: 14px !important;
-        padding: 20px 18px 16px 18px !important;
+        padding: 22px 20px 18px 20px !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
         transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
-        min-height: 245px !important;
+        min-height: 250px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
@@ -186,52 +210,52 @@ st.markdown("""
     }
     [data-testid="stVerticalBlockBorderWrapper"]:hover {
         border-color: #FFD4C9 !important;
-        box-shadow: 0 6px 16px rgba(255, 90, 54, 0.08) !important;
+        box-shadow: 0 6px 18px rgba(255, 90, 54, 0.09) !important;
         transform: translateY(-2px) !important;
     }
 
     .card-icon-box {
-        width: 46px;
-        height: 46px;
-        border-radius: 10px;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         background-color: #FFF0EB;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
 
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.12rem;
         font-weight: 700;
         color: #111827;
         margin-bottom: 4px;
     }
 
     .card-desc {
-        font-size: 0.85rem;
+        font-size: 0.86rem;
         color: #64748B;
-        line-height: 1.35;
-        margin-bottom: 14px;
-        min-height: 36px;
+        line-height: 1.4;
+        margin-bottom: 16px;
+        min-height: 38px;
     }
 
-    /* Coral Buttons Inside Cards */
+    /* Coral Action Buttons */
     .stButton > button[kind="primary"] {
         background-color: #FF5A36 !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
-        font-size: 0.9rem !important;
-        padding: 0.6rem 1rem !important;
+        font-size: 0.92rem !important;
+        padding: 0.65rem 1.2rem !important;
         width: 100% !important;
         box-shadow: 0 1px 2px rgba(255, 90, 54, 0.2) !important;
-        transition: all 0.15s ease !important;
+        transition: all 0.2s ease !important;
     }
     .stButton > button[kind="primary"]:hover {
         background-color: #E64724 !important;
-        box-shadow: 0 4px 8px rgba(255, 90, 54, 0.3) !important;
+        box-shadow: 0 4px 10px rgba(255, 90, 54, 0.3) !important;
     }
     .stButton > button[kind="primary"]:active {
         transform: translateY(1px);
@@ -244,51 +268,127 @@ st.markdown("""
         margin-top: 6px;
     }
 
-    /* Recent Files */
+    /* Tool Workspace Hero Container */
+    .tool-hero-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 12px 0 20px 0;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #ECEEF1;
+    }
+    .tool-hero-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        background-color: #FFF0EB;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .tool-hero-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+    .tool-hero-desc {
+        font-size: 0.92rem;
+        color: #64748B;
+        margin: 2px 0 0 0;
+    }
+
+    /* Tool Workspace Card */
+    .tool-card-panel {
+        background: #FFFFFF;
+        border: 1px solid #EAEBEF;
+        border-radius: 16px;
+        padding: 28px 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        max-width: 920px;
+        margin-bottom: 24px;
+    }
+
+    /* Beautiful Styled File Uploader */
+    [data-testid="stFileUploader"] {
+        background-color: #FAFAFC !important;
+        border: 1.5px dashed #CBD5E1 !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stFileUploader"]:hover {
+        border-color: #FF5A36 !important;
+        background-color: #FFF9F7 !important;
+    }
+    [data-testid="stFileUploader"] button {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
+    }
+
+    /* Back Button */
+    .back-btn-box .stButton > button {
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        color: #475569 !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        padding: 6px 14px !important;
+        border-radius: 8px !important;
+        width: auto !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    }
+    .back-btn-box .stButton > button:hover {
+        background-color: #F8FAFC !important;
+        border-color: #CBD5E1 !important;
+        color: #0F172A !important;
+    }
+
+    /* Recent Files Header */
     .recent-section-header {
-        margin-top: 32px;
+        margin-top: 36px;
         margin-bottom: 16px;
-        padding-top: 18px;
+        padding-top: 20px;
         border-top: 1px solid #ECEEF1;
     }
     .recent-title {
-        font-size: 1.15rem;
+        font-size: 1.18rem;
         font-weight: 700;
         color: #111827;
-    }
-
-    /* Tool Panels */
-    .action-panel {
-        background: #FFFFFF;
-        border: 1px solid #EAEBEF;
-        border-radius: 14px;
-        padding: 26px 30px;
-        margin-top: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
 </style>
 """, unsafe_allow_html=True)
 
 
 # =====================================================================
-# SIDEBAR WITH ALL 10 TOOLS
+# SIDEBAR
 # =====================================================================
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand-badge">⚡ PDF MASTER TOOLKIT</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="sidebar-brand-box">
+        <div class="brand-icon-sq">⚡</div>
+        <div class="brand-title-text">PDF Master Toolkit</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     tools_menu = [
-        ("dashboard", "🏠 Dashboard"),
-        ("ppt2pdf", "📊 Bulk PPT to PDF"),
-        ("merge", "📑 Merge PDF"),
-        ("split", "✂️ Split PDF"),
-        ("compress", "🗜️ Compress PDF"),
-        ("word2pdf", "📝 Word to PDF"),
-        ("images2pdf", "🖼️ Images to PDF"),
-        ("pdf2images", "📄 PDF to Images"),
-        ("watermark", "💧 Watermark PDF"),
-        ("protect", "🔒 Protect & Unlock"),
-        ("extract", "🔍 Extract Text & Media"),
-        ("rotate", "🔄 Rotate Pages"),
+        ("dashboard", "🏠  Dashboard"),
+        ("ppt2pdf", "📊  Bulk PPT to PDF"),
+        ("merge", "📑  Merge PDF"),
+        ("split", "✂️  Split PDF"),
+        ("compress", "🗜️  Compress PDF"),
+        ("word2pdf", "📝  Word to PDF"),
+        ("images2pdf", "🖼️  Images to PDF"),
+        ("pdf2images", "📄  PDF to Images"),
+        ("watermark", "💧  Watermark PDF"),
+        ("protect", "🔒  Protect & Unlock"),
+        ("extract", "🔍  Extract Content"),
+        ("rotate", "🔄  Rotate PDF"),
     ]
 
     for key, label in tools_menu:
@@ -298,17 +398,17 @@ with st.sidebar:
             st.session_state.current_view = key
             st.rerun()
 
-    st.markdown("<hr style='border: none; border-top: 1px solid #ECEEF1; margin: 18px 0 12px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: none; border-top: 1px solid #F1F5F9; margin: 18px 0 12px 0;'>", unsafe_allow_html=True)
 
-    if st.button("🕒 Recent Files", key="nav_recent", type="secondary"):
+    if st.button("🕒  Recent Files", key="nav_recent", type="secondary"):
         st.session_state.current_view = "recent_view"
         st.rerun()
 
-    if st.button("⚙️ Settings", key="nav_settings", type="secondary"):
+    if st.button("⚙️  Settings", key="nav_settings", type="secondary"):
         st.session_state.current_view = "settings_view"
         st.rerun()
 
-    if st.button("❓ Help", key="nav_help", type="secondary"):
+    if st.button("❓  Help & Tips", key="nav_help", type="secondary"):
         st.session_state.current_view = "help_view"
         st.rerun()
 
@@ -316,6 +416,28 @@ with st.sidebar:
 def switch_view(view_name):
     st.session_state.current_view = view_name
     st.rerun()
+
+
+def render_tool_header(title: str, description: str, svg_path: str):
+    """Renders a consistent back button and hero card across all tools."""
+    st.markdown('<div class="back-btn-box">', unsafe_allow_html=True)
+    if st.button("← Back to Dashboard", key=f"back_btn_{st.session_state.current_view}"):
+        switch_view("dashboard")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="tool-hero-box">
+        <div class="tool-hero-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                {svg_path}
+            </svg>
+        </div>
+        <div>
+            <h2 class="tool-hero-title">{title}</h2>
+            <p class="tool-hero-desc">{description}</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # =====================================================================
@@ -544,7 +666,6 @@ if st.session_state.current_view == "dashboard":
                 switch_view("rotate")
             st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
-    # Empty 3rd column in row 4 for balance
     with r4c3:
         pass
 
@@ -561,7 +682,7 @@ if st.session_state.current_view == "dashboard":
 
     if not recent_list:
         st.markdown("""
-        <div style="background-color: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 10px; padding: 24px; text-align: center; color: #94A3B8;">
+        <div style="background-color: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 12px; padding: 26px; text-align: center; color: #94A3B8;">
             <p style="margin: 0; font-size: 0.95rem;">No recent files yet. Select any tool above to start processing documents.</p>
         </div>
         """, unsafe_allow_html=True)
@@ -582,34 +703,20 @@ if st.session_state.current_view == "dashboard":
 
 
 # =====================================================================
-# VIEW 2: PPT TO PDF (BULK 100+ FILES CAPABLE)
+# VIEW 2: BULK PPT TO PDF (HERO PANEL)
 # =====================================================================
 elif st.session_state.current_view == "ppt2pdf":
-    if st.button("← Back to Dashboard", key="b_ppt"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Bulk PowerPoint to PDF",
+        "Convert single presentations or scan an entire folder of 100+ files at native speed.",
+        '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>'
+    )
 
-    st.markdown("""
-    <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="card-icon-box" style="margin: 0;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2"/>
-                <line x1="8" y1="21" x2="16" y2="21"/>
-                <line x1="12" y1="17" x2="12" y2="21"/>
-                <path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>
-            </svg>
-        </div>
-        <div>
-            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">Bulk PowerPoint to PDF Converter</h2>
-            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Convert single presentations or scan an entire folder of 100+ files in seconds.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    tab_bulk, tab_upload = st.tabs(["📁 Bulk Folder Mode (Fastest for 100+ Presentations)", "📤 Upload Files via Browser"])
+    tab_bulk, tab_upload = st.tabs(["📁 Bulk Folder Mode (Recommended for 100+ Presentations)", "📤 Upload Files via Browser"])
 
     with tab_bulk:
-        st.markdown('<div class="action-panel">', unsafe_allow_html=True)
-        st.markdown("#### ⚡ Bulk Folder Converter")
+        st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
+        st.markdown("#### ⚡ Batch Folder Converter")
         st.caption("Point to any folder on your computer containing .ppt, .pptx, .pps, or .ppsx files.")
 
         folder_input = st.text_input(
@@ -656,7 +763,7 @@ elif st.session_state.current_view == "ppt2pdf":
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab_upload:
-        st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
         uploaded_ppts = st.file_uploader(
             "Drag and drop PowerPoint files here:",
             type=["pptx", "ppt", "pps", "ppsx"],
@@ -713,11 +820,13 @@ elif st.session_state.current_view == "ppt2pdf":
 # VIEW 3: MERGE PDF
 # =====================================================================
 elif st.session_state.current_view == "merge":
-    if st.button("← Back to Dashboard", key="b_merge"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Merge PDF Files",
+        "Combine multiple PDF documents into a single document in any desired order.",
+        '<path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/><path d="M14 2V7H19"/><path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>'
+    )
 
-    st.markdown("## 📑 Merge PDF Files")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_pdfs = st.file_uploader("Select PDF files to merge (order matters):", type=["pdf"], accept_multiple_files=True, key="up_merge")
 
     if uploaded_pdfs:
@@ -759,18 +868,20 @@ elif st.session_state.current_view == "merge":
 # VIEW 4: SPLIT PDF
 # =====================================================================
 elif st.session_state.current_view == "split":
-    if st.button("← Back to Dashboard", key="b_split"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Split PDF Document",
+        "Extract individual pages or custom page ranges into clean separate PDF documents.",
+        '<path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/><line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>'
+    )
 
-    st.markdown("## ✂️ Split PDF")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to split:", type=["pdf"], key="up_split")
 
     if uploaded_pdf:
         split_mode = st.radio("Splitting Strategy:", ["Split into individual pages (1 PDF per page)", "Extract custom page ranges (e.g. 1-3, 5)"])
         range_val = ""
         if "Extract" in split_mode:
-            range_val = st.text_input("Enter Page Ranges:", "1-3, 5")
+            range_val = st.text_input("Enter Page Ranges (e.g., 1-3, 5, 8-10):", "1-3, 5")
 
         if st.button("⚡ Split PDF Now", type="primary", key="btn_run_s"):
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -804,11 +915,13 @@ elif st.session_state.current_view == "split":
 # VIEW 5: COMPRESS PDF
 # =====================================================================
 elif st.session_state.current_view == "compress":
-    if st.button("← Back to Dashboard", key="b_comp"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Compress PDF",
+        "Shrink PDF file size while keeping text and graphic elements clear and readable.",
+        '<path d="M4 14H10V20"/><path d="M10 14L3 21"/><path d="M20 10H14V4"/><path d="M14 10L21 3"/>'
+    )
 
-    st.markdown("## 🗜️ Compress PDF")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to compress:", type=["pdf"], key="up_comp")
 
     if uploaded_pdf:
@@ -849,11 +962,13 @@ elif st.session_state.current_view == "compress":
 # VIEW 6: WORD TO PDF
 # =====================================================================
 elif st.session_state.current_view == "word2pdf":
-    if st.button("← Back to Dashboard", key="b_word"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Word to PDF Converter",
+        "Convert Microsoft Word documents (.docx, .doc) to PDF with accurate fonts and margins.",
+        '<path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15L10.5 12L12 15L13.5 12L15 15"/>'
+    )
 
-    st.markdown("## 📝 Word to PDF Converter")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_words = st.file_uploader("Upload Word documents (.doc, .docx):", type=["doc", "docx"], accept_multiple_files=True, key="up_word")
 
     if uploaded_words:
@@ -893,11 +1008,13 @@ elif st.session_state.current_view == "word2pdf":
 # VIEW 7: IMAGES TO PDF
 # =====================================================================
 elif st.session_state.current_view == "images2pdf":
-    if st.button("← Back to Dashboard", key="b_i2p"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Images to PDF Converter",
+        "Merge JPG, PNG, WEBP, and BMP images into a unified, cleanly sized PDF file.",
+        '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'
+    )
 
-    st.markdown("## 🖼️ Images to PDF Converter")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_imgs = st.file_uploader("Select images to combine (JPG, PNG, WEBP, BMP):", type=["jpg", "png", "webp", "jpeg", "bmp"], accept_multiple_files=True, key="up_i2p")
 
     if uploaded_imgs:
@@ -927,11 +1044,13 @@ elif st.session_state.current_view == "images2pdf":
 # VIEW 8: PDF TO IMAGES
 # =====================================================================
 elif st.session_state.current_view == "pdf2images":
-    if st.button("← Back to Dashboard", key="b_p2i"):
-        switch_view("dashboard")
+    render_tool_header(
+        "PDF to Images Converter",
+        "Convert each page of your PDF into crisp PNG or JPG images at custom resolution.",
+        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="1.5"/><path d="m8 18 3-3 4 4"/>'
+    )
 
-    st.markdown("## 📄 PDF to Images Converter")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="up_p2i")
 
     if uploaded_pdf:
@@ -966,11 +1085,13 @@ elif st.session_state.current_view == "pdf2images":
 # VIEW 9: WATERMARK PDF
 # =====================================================================
 elif st.session_state.current_view == "watermark":
-    if st.button("← Back to Dashboard", key="b_wm"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Watermark PDF",
+        "Add custom diagonal text watermarks across every page of your PDF.",
+        '<circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="m4.93 4.93 14.14 14.14"/>'
+    )
 
-    st.markdown("## 💧 Watermark PDF")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF to watermark:", type=["pdf"], key="up_wm")
 
     if uploaded_pdf:
@@ -1003,11 +1124,13 @@ elif st.session_state.current_view == "watermark":
 # VIEW 10: PROTECT & UNLOCK
 # =====================================================================
 elif st.session_state.current_view == "protect":
-    if st.button("← Back to Dashboard", key="b_sec"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Protect & Unlock PDF",
+        "Add 128-bit password encryption to your PDF or remove passwords from protected files.",
+        '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+    )
 
-    st.markdown("## 🔒 Password Protect & Unlock PDF")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
     sec_action = st.radio("Choose Action:", ["Encrypt & Set Password", "Decrypt & Remove Password"], horizontal=True, key="sec_act_choice")
     uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="up_sec")
 
@@ -1044,31 +1167,36 @@ elif st.session_state.current_view == "protect":
 
 
 # =====================================================================
-# VIEW 11: EXTRACT CONTENT (TEXT & IMAGES)
+# VIEW 11: EXTRACT CONTENT (TEXT & IMAGES) - HERO PANEL
 # =====================================================================
 elif st.session_state.current_view == "extract":
-    if st.button("← Back to Dashboard", key="b_ext"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Extract Content (Text & Media)",
+        "Extract all readable text to TXT or export all raw embedded images at original quality.",
+        '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>'
+    )
 
-    st.markdown("## 🔍 Extract Content (Text & Media)")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
-    uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="up_ext")
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
+    uploaded_pdf = st.file_uploader("Upload PDF file to extract from:", type=["pdf"], key="up_ext")
 
     if uploaded_pdf:
         t_text, t_imgs = st.tabs(["📄 Extract Readable Text", "🖼️ Extract Embedded Images"])
 
         with t_text:
-            if st.button("⚡ Extract All Text", type="primary", key="btn_ext_txt"):
+            st.caption("Extracts all readable textual paragraphs into formatted plain text.")
+            if st.button("⚡ Extract Text Now", type="primary", key="btn_ext_txt"):
                 with tempfile.TemporaryDirectory() as temp_dir:
                     in_p = os.path.join(temp_dir, uploaded_pdf.name)
                     with open(in_p, "wb") as f:
                         f.write(uploaded_pdf.getbuffer())
                     raw_text = extract_text_from_pdf(in_p)
                     save_recent_file(uploaded_pdf.name, "Extract Text", len(raw_text.encode('utf-8')) / 1024)
-                    st.text_area("Extracted Content:", raw_text, height=280)
-                    st.download_button("📥 Download as .txt", data=raw_text, file_name=f"{uploaded_pdf.name}.txt")
+                    st.success("🎉 Text extracted successfully!")
+                    st.text_area("Extracted Content Preview:", raw_text, height=300)
+                    st.download_button("📥 Download Text File (.TXT)", data=raw_text, file_name=f"{uploaded_pdf.name}.txt", mime="text/plain", type="primary")
 
         with t_imgs:
+            st.caption("Dumps all original bitmap images (JPEG, PNG) embedded within the PDF.")
             if st.button("⚡ Extract Embedded Images", type="primary", key="btn_ext_imgs"):
                 with tempfile.TemporaryDirectory() as temp_dir:
                     in_p = os.path.join(temp_dir, uploaded_pdf.name)
@@ -1083,8 +1211,8 @@ elif st.session_state.current_view == "extract":
                                 files_dict[os.path.basename(im)] = imf.read()
                         zip_data = get_zip_bytes(files_dict)
                         save_recent_file(uploaded_pdf.name, "Extract Images", len(zip_data) / 1024)
-                        st.success(f"🎉 Extracted {len(imgs)} image(s)!")
-                        st.download_button("📥 Download Extracted Images (.ZIP)", data=zip_data, file_name="extracted_images.zip", mime="application/zip")
+                        st.success(f"🎉 Extracted **{len(imgs)}** embedded image(s)!")
+                        st.download_button("📥 Download Extracted Images (.ZIP)", data=zip_data, file_name="extracted_images.zip", mime="application/zip", type="primary")
                     else:
                         st.info("No embedded raster images found in this PDF.")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1094,12 +1222,14 @@ elif st.session_state.current_view == "extract":
 # VIEW 12: ROTATE PDF
 # =====================================================================
 elif st.session_state.current_view == "rotate":
-    if st.button("← Back to Dashboard", key="b_rot"):
-        switch_view("dashboard")
+    render_tool_header(
+        "Rotate PDF Pages",
+        "Permanently rotate page orientation by 90°, 180°, or 270° clockwise.",
+        '<path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>'
+    )
 
-    st.markdown("## 🔄 Rotate PDF Pages")
-    st.markdown('<div class="action-panel">', unsafe_allow_html=True)
-    uploaded_pdf = st.file_uploader("Upload PDF to rotate:", type=["pdf"], key="up_rot")
+    st.markdown('<div class="tool-card-panel">', unsafe_allow_html=True)
+    uploaded_pdf = st.file_uploader("Upload PDF file to rotate:", type=["pdf"], key="up_rot")
 
     if uploaded_pdf:
         rot_angle = st.selectbox("Rotation Angle:", [90, 180, 270], format_func=lambda a: f"{a}° Clockwise", key="rot_deg")
@@ -1124,8 +1254,10 @@ elif st.session_state.current_view == "rotate":
 # VIEW 13: RECENT FILES FULL VIEW
 # =====================================================================
 elif st.session_state.current_view == "recent_view":
+    st.markdown('<div class="back-btn-box">', unsafe_allow_html=True)
     if st.button("← Back to Dashboard", key="b_rec"):
         switch_view("dashboard")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("## 🕒 Recent Processed Files")
     recent_list = load_recent_files()
@@ -1149,8 +1281,10 @@ elif st.session_state.current_view == "recent_view":
 # VIEW 14: SETTINGS & HELP
 # =====================================================================
 elif st.session_state.current_view in ("settings_view", "help_view"):
+    st.markdown('<div class="back-btn-box">', unsafe_allow_html=True)
     if st.button("← Back to Dashboard", key="b_sh"):
         switch_view("dashboard")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if st.session_state.current_view == "settings_view":
         st.markdown("## ⚙️ Application Settings")
@@ -1158,21 +1292,14 @@ elif st.session_state.current_view in ("settings_view", "help_view"):
         - **Project Name:** PDF Master Toolkit
         - **Engine:** Native PowerPoint COM + Word COM + PyMuPDF + PyPDF
         - **Mode:** 100% Offline, Local & Private
-        - **Bulk Capability:** Unlimited files (optimized for 100+ files)
+        - **Bulk Capability:** Unlimited files (optimized for 100+ presentations)
         """)
     else:
-        st.markdown("## ❓ Help & Documentation")
+        st.markdown("## ❓ Help & Tips")
         st.markdown("""
-        **Features Included:**
-        1. **Bulk PPT to PDF:** Fast batch conversion for 100+ PowerPoint presentations.
-        2. **Merge PDF:** Combine multiple PDFs in custom order.
-        3. **Split PDF:** Extract pages or split into individual files.
-        4. **Compress PDF:** Shrink PDF file size while keeping visual quality.
-        5. **Word to PDF:** Convert Word documents (.docx, .doc) to PDF.
-        6. **Images to PDF:** Combine JPG, PNG, WEBP into a single PDF.
-        7. **PDF to Images:** Export PDF pages as high-resolution PNG/JPG.
-        8. **Watermark PDF:** Add custom diagonal text watermarks.
-        9. **Protect & Unlock:** Encrypt or decrypt password-protected PDFs.
-        10. **Extract Content:** Extract readable text or embedded images.
-        11. **Rotate PDF:** Change page orientation permanently.
+        **Quick Tips:**
+        1. **Bulk PPT to PDF:** When you have 100+ files, use the **Bulk Folder Mode**. It bypasses browser file upload limits and runs directly at native system speed.
+        2. **Merge PDFs:** Drag & drop your PDF documents in the order you want them combined.
+        3. **Compress PDF:** PyMuPDF optimizes stream objects and downsamples large embedded photos without visible quality degradation.
+        4. **Extract Content:** Quickly grab text or extract embedded photos without recompressing.
         """)
