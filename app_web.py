@@ -102,9 +102,13 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
 
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    #MainMenu, footer, header, [data-testid="stHeader"], [data-testid="stDecoration"], [data-testid="stToolbar"] {
+        display: none !important;
+        height: 0px !important;
+        visibility: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
     /* Ambient Floating Blurred PDF Elements in Background */
     .ambient-motion-bg {
@@ -180,20 +184,47 @@ st.markdown("""
         animation: springSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Pinned Clean Sidebar */
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
+    /* Clean Sidebar with Smooth Collapse and Open Support */
     [data-testid="stSidebar"], section[data-testid="stSidebar"] {
-        min-width: 250px !important;
-        max-width: 250px !important;
         width: 250px !important;
+        min-width: 250px !important;
         background-color: #FFFFFF !important;
         border-right: 1px solid #ECEEF1 !important;
-        display: block !important;
-        transform: none !important;
-        visibility: visible !important;
         z-index: 10 !important;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), width 0.28s ease !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"], 
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        transform: translateX(-100%) !important;
+        min-width: 0 !important;
+        width: 0 !important;
+    }
+
+    /* Modern Sleek Collapse & Expand Toggle Buttons */
+    [data-testid="stSidebarCollapseButton"] button,
+    [data-testid="collapsedControl"] button {
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        color: #475569 !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stSidebarCollapseButton"] button:hover,
+    [data-testid="collapsedControl"] button:hover {
+        background: #FFF0EB !important;
+        color: #FF5A36 !important;
+        border-color: #FFD2C7 !important;
+        transform: scale(1.04) !important;
+    }
+
+    /* Position the reopen toggle cleanly at top-left */
+    [data-testid="collapsedControl"] {
+        display: block !important;
+        position: fixed !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 99 !important;
     }
     [data-testid="stSidebar"] .block-container {
         padding-top: 1.5rem !important;
