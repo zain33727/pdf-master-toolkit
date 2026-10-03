@@ -1,7 +1,7 @@
 """
 PDF Master Toolkit - All-in-One Offline Suite
-Clean minimal sidebar, vector GUI logo, zero wasted space,
-and Framer Motion-style spring animations & micro-interactions.
+Unified single-card tool workspaces, ambient blurred floating PDF motion background,
+minimal clean sidebar, and high-end Framer Motion-style physics.
 """
 
 import os
@@ -33,7 +33,7 @@ from core import (
 
 st.set_page_config(
     page_title="PDF Master Toolkit",
-    page_icon="⚡",
+    page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -90,12 +90,12 @@ def get_zip_bytes(files_dict: dict):
 if "current_view" not in st.session_state:
     st.session_state.current_view = "dashboard"
 
-# Framer-Motion Style Spring Animations, Minimal Sidebar & Clean Spacing
+# High-End Styling: Ambient Blurred PDF Motion, Zero Disjointed Boxes, Unified Single-Card Workspaces
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-    /* Global Theme & Animation Presets */
+    /* Global Background and Typography */
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], .main, section.main {
         background-color: #F8F9FA !important;
         color: #1E293B !important;
@@ -106,27 +106,81 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Framer Motion-Style Entrance Animation */
-    @keyframes springFadeIn {
-        0% {
-            opacity: 0;
-            transform: translateY(14px) scale(0.99);
-        }
-        70% {
-            opacity: 0.9;
-            transform: translateY(-2px) scale(1.002);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    /* Ambient Floating Blurred PDF Elements in Background */
+    .ambient-motion-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+    .ambient-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.55;
+        animation: floatOrb 22s ease-in-out infinite alternate;
+    }
+    .orb-1 {
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(circle, #FFE7DF 0%, rgba(255, 90, 54, 0.08) 70%);
+        top: -120px;
+        right: 8%;
+        animation-duration: 24s;
+    }
+    .orb-2 {
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, #FFF0EB 0%, rgba(255, 130, 95, 0.06) 70%);
+        bottom: 8%;
+        left: 24%;
+        animation-duration: 28s;
+    }
+    .floating-pdf-shape {
+        position: absolute;
+        filter: blur(4px);
+        opacity: 0.45;
+        animation: floatDoc 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+    .shape-1 {
+        top: 15%;
+        right: 12%;
+        animation-duration: 18s;
+    }
+    .shape-2 {
+        bottom: 18%;
+        left: 30%;
+        animation-duration: 26s;
     }
 
-    .main-content-animated {
-        animation: springFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    @keyframes floatOrb {
+        0% { transform: translate(0px, 0px) scale(1); }
+        50% { transform: translate(30px, -25px) scale(1.05); }
+        100% { transform: translate(-20px, 20px) scale(0.97); }
+    }
+    @keyframes floatDoc {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-28px) rotate(5deg); }
+        100% { transform: translateY(18px) rotate(-4deg); }
     }
 
-    /* Pinned Minimal Left Sidebar */
+    /* Page Entrance Animation */
+    @keyframes springSlideUp {
+        0% { opacity: 0; transform: translateY(16px) scale(0.99); }
+        70% { opacity: 0.9; transform: translateY(-2px) scale(1.002); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .page-animated {
+        position: relative;
+        z-index: 1;
+        animation: springSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Pinned Clean Sidebar */
     [data-testid="collapsedControl"] {
         display: none !important;
     }
@@ -139,15 +193,16 @@ st.markdown("""
         display: block !important;
         transform: none !important;
         visibility: visible !important;
+        z-index: 10 !important;
     }
     [data-testid="stSidebar"] .block-container {
-        padding-top: 1.4rem !important;
+        padding-top: 1.5rem !important;
         padding-left: 1.1rem !important;
         padding-right: 1.1rem !important;
         background-color: #FFFFFF !important;
     }
 
-    /* Logo Matching GUI Aesthetic */
+    /* Brand Logo Component */
     .brand-logo-container {
         display: flex;
         align-items: center;
@@ -185,7 +240,7 @@ st.markdown("""
         letter-spacing: 0.08em;
     }
 
-    /* Clean Minimal Sidebar Links */
+    /* Sidebar Navigation Links */
     [data-testid="stSidebar"] .stButton > button {
         display: flex !important;
         align-items: center !important;
@@ -223,7 +278,7 @@ st.markdown("""
         padding-left: 2.5rem !important;
         padding-right: 2.5rem !important;
         max-width: 1280px !important;
-        background-color: #F8F9FA !important;
+        background-color: transparent !important;
     }
 
     /* Dashboard Header */
@@ -240,8 +295,16 @@ st.markdown("""
         margin-bottom: 26px;
     }
 
-    /* Interactive Cards with Framer Motion Spring Physics */
-    [data-testid="stVerticalBlockBorderWrapper"] {
+    /* Target ONLY specific dashboard cards, NOT arbitrary columns or wrappers! */
+    .st-key-btn_c_ppt, .st-key-btn_c_merge, .st-key-btn_c_split,
+    .st-key-btn_c_comp, .st-key-btn_c_word, .st-key-btn_c_i2p,
+    .st-key-btn_c_p2i, .st-key-btn_c_wm, .st-key-btn_c_sec,
+    .st-key-btn_c_ext, .st-key-btn_c_rot {
+        margin-top: auto;
+    }
+
+    /* Dashboard Card Containers */
+    .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
         border: 1px solid #ECEEF1 !important;
         border-radius: 16px !important;
@@ -254,7 +317,7 @@ st.markdown("""
         justify-content: space-between !important;
         margin-bottom: 16px !important;
     }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+    .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"]:hover {
         border-color: #FFD2C7 !important;
         box-shadow: 0 10px 24px rgba(255, 90, 54, 0.12) !important;
         transform: translateY(-4px) scale(1.01) !important;
@@ -271,7 +334,7 @@ st.markdown("""
         margin-bottom: 14px;
         transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover .card-icon-box {
+    .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"]:hover .card-icon-box {
         transform: scale(1.1) rotate(-2deg);
         background-color: #FFE4DC;
     }
@@ -290,8 +353,14 @@ st.markdown("""
         margin-bottom: 16px;
         min-height: 38px;
     }
+    .card-subtext {
+        font-size: 0.78rem;
+        color: #94A3B8;
+        text-align: center;
+        margin-top: 6px;
+    }
 
-    /* Spring Action Buttons */
+    /* Primary Coral Buttons */
     .stButton > button[kind="primary"] {
         background-color: #FF5A36 !important;
         color: #FFFFFF !important;
@@ -313,100 +382,88 @@ st.markdown("""
         transform: scale(0.98);
     }
 
-    .card-subtext {
-        font-size: 0.78rem;
-        color: #94A3B8;
-        text-align: center;
-        margin-top: 6px;
+    /* UNIFIED SINGLE-CARD TOOL WORKSPACE (NO EXTRA OR DISJOINTED BOXES!) */
+    .unified-workspace-card {
+        background: #FFFFFF;
+        border: 1px solid #ECEEF1;
+        border-radius: 18px;
+        padding: 26px 32px 34px 32px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
     }
 
-    /* TIGHT Compact Top Navigation Bar (ZERO WASTED SPACE) */
-    .compact-top-nav {
+    /* Workspace Top Navigation Row */
+    .ws-top-nav {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 14px;
-        padding: 0;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #F1F5F9;
     }
-    .compact-back-btn .stButton > button {
-        background-color: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
-        color: #334155 !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        padding: 6px 14px !important;
-        height: 34px !important;
-        border-radius: 8px !important;
-        width: auto !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
-        transition: all 0.15s ease !important;
+    .ws-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #475569;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.15s ease;
     }
-    .compact-back-btn .stButton > button:hover {
-        background-color: #F8FAFC !important;
-        border-color: #CBD5E1 !important;
-        color: #FF5A36 !important;
-        transform: translateX(-2px);
+    .ws-back-link:hover {
+        color: #FF5A36;
     }
-    .compact-breadcrumb {
+    .ws-breadcrumb {
         font-size: 0.85rem;
         color: #94A3B8;
         font-weight: 500;
     }
-    .compact-breadcrumb strong {
+    .ws-breadcrumb strong {
         color: #0F172A;
     }
 
-    /* Tool Workspace Hero (Clean & Compact) */
-    .tool-hero-compact {
-        background: #FFFFFF;
-        border: 1px solid #EAEBEF;
-        border-radius: 14px;
-        padding: 20px 24px;
+    /* Workspace Hero Header */
+    .ws-hero {
         display: flex;
         align-items: center;
-        gap: 16px;
-        margin-bottom: 16px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        gap: 18px;
+        margin-bottom: 24px;
     }
-    .tool-hero-compact-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
+    .ws-hero-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
         background-color: #FFF0EB;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
-    .tool-hero-compact-title {
-        font-size: 1.4rem;
+    .ws-hero-title {
+        font-size: 1.55rem;
         font-weight: 800;
         color: #0F172A;
-        margin: 0 0 2px 0;
+        margin: 0 0 4px 0;
         letter-spacing: -0.015em;
     }
-    .tool-hero-compact-desc {
-        font-size: 0.88rem;
+    .ws-hero-desc {
+        font-size: 0.92rem;
         color: #64748B;
         margin: 0;
+        line-height: 1.4;
     }
 
-    /* Tool Action Card */
-    .tool-action-panel {
-        background: #FFFFFF;
-        border: 1px solid #EAEBEF;
-        border-radius: 16px;
-        padding: 26px 30px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-        margin-bottom: 24px;
-    }
-
-    /* Drag & Drop File Zone */
+    /* Styled Drag & Drop File Zone */
     [data-testid="stFileUploader"] {
         background-color: #FAFAFC !important;
         border: 1.5px dashed #CBD5E1 !important;
         border-radius: 12px !important;
-        padding: 18px !important;
+        padding: 20px !important;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stFileUploader"]:hover {
@@ -423,16 +480,10 @@ st.markdown("""
         font-size: 0.88rem !important;
     }
 
-    /* Empty State Card */
+    /* Empty State in Recent Files */
     .empty-state-box {
-        background: #FFFFFF;
-        border: 1px solid #EAEBEF;
-        border-radius: 16px;
-        padding: 44px 28px;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        max-width: 580px;
-        margin: 20px auto;
+        padding: 44px 20px;
     }
     .empty-icon-circle {
         width: 58px;
@@ -460,11 +511,33 @@ st.markdown("""
         line-height: 1.45;
     }
 </style>
+
+<!-- Floating Blurred PDF Ambient Motion Background -->
+<div class="ambient-motion-bg">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <!-- Blurred Floating PDF Document 1 -->
+    <div class="floating-pdf-shape shape-1">
+        <svg width="150" height="190" viewBox="0 0 24 24" fill="none">
+            <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="rgba(255, 90, 54, 0.07)"/>
+            <path d="M14 3V8H19" fill="rgba(255, 90, 54, 0.14)"/>
+            <rect x="8" y="12" width="8" height="1.5" rx="0.75" fill="rgba(255, 90, 54, 0.2)"/>
+            <rect x="8" y="15" width="5" height="1.5" rx="0.75" fill="rgba(255, 90, 54, 0.2)"/>
+        </svg>
+    </div>
+    <!-- Blurred Floating PDF Document 2 -->
+    <div class="floating-pdf-shape shape-2">
+        <svg width="200" height="250" viewBox="0 0 24 24" fill="none">
+            <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="rgba(255, 107, 74, 0.05)"/>
+            <path d="M14 3V8H19" fill="rgba(255, 107, 74, 0.1)"/>
+        </svg>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 
 # =====================================================================
-# MINIMAL SLEEK SIDEBAR (CLEAN, NO TOOL CLUTTER)
+# MINIMAL SLEEK SIDEBAR
 # =====================================================================
 with st.sidebar:
     st.markdown("""
@@ -483,7 +556,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # Clean, Essential Navigation Links
     nav_links = [
         ("dashboard", "🏠  Dashboard"),
         ("recent_view", "🕒  Recent Files"),
@@ -507,44 +579,47 @@ def switch_view(view_name):
     st.rerun()
 
 
-def render_workspace_header(title: str, description: str, svg_path: str):
-    """Renders a tight, zero-waste top navigation bar and hero header."""
-    st.markdown('<div class="main-content-animated"><div style="max-width: 900px; margin: 0 auto;">', unsafe_allow_html=True)
+def begin_unified_workspace(title: str, description: str, svg_path: str):
+    """Renders the top bar and hero inside ONE unified card container with zero disjointed boxes."""
+    st.markdown('<div class="page-animated"><div class="unified-workspace-card">', unsafe_allow_html=True)
     
-    # Compact 1-line top bar
-    col_back, col_bread = st.columns([2.5, 7.5])
+    col_back, col_bread = st.columns([3, 7])
     with col_back:
-        st.markdown('<div class="compact-back-btn">', unsafe_allow_html=True)
         if st.button("← Back to Dashboard", key=f"b_{st.session_state.current_view}"):
             switch_view("dashboard")
-        st.markdown('</div>', unsafe_allow_html=True)
     with col_bread:
         st.markdown(f'<div style="text-align: right; padding-top: 6px; font-size: 0.85rem; color: #94A3B8;">Dashboard &nbsp;/&nbsp; <strong style="color: #0F172A;">{title}</strong></div>', unsafe_allow_html=True)
 
     st.markdown(f"""
-    <div class="tool-hero-compact">
-        <div class="tool-hero-compact-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="ws-hero">
+        <div class="ws-hero-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 {svg_path}
             </svg>
         </div>
         <div>
-            <h1 class="tool-hero-compact-title">{title}</h1>
-            <p class="tool-hero-compact-desc">{description}</p>
+            <h1 class="ws-hero-title">{title}</h1>
+            <p class="ws-hero-desc">{description}</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+
+def end_unified_workspace():
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 # =====================================================================
 # VIEW 1: DASHBOARD (ALL 10+ REAL TOOLS WITH SPRING HOVER PHYSICS)
 # =====================================================================
 if st.session_state.current_view == "dashboard":
-    st.markdown('<div class="main-content-animated">', unsafe_allow_html=True)
+    st.markdown('<div class="page-animated">', unsafe_allow_html=True)
     st.markdown("""
     <div class="dash-header-title">PDF Master Toolkit</div>
     <div class="dash-header-sub">All-in-one offline workspace • 100% private processing on your local machine</div>
     """, unsafe_allow_html=True)
+
+    st.markdown('<div class="dash-grid-card">', unsafe_allow_html=True)
 
     # ROW 1: Bulk PPT to PDF, Merge PDF, Split PDF
     r1c1, r1c2, r1c3 = st.columns(3, gap="medium")
@@ -755,7 +830,9 @@ if st.session_state.current_view == "dashboard":
     with r4c3:
         pass
 
-    # Recent Files Bottom Preview
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Recent Files Preview at Bottom of Dashboard
     st.markdown("""
     <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #ECEEF1;">
         <div style="font-size: 1.15rem; font-weight: 700; color: #0F172A; margin-bottom: 12px;">Recent Files</div>
@@ -766,7 +843,7 @@ if st.session_state.current_view == "dashboard":
 
     if not recent_list:
         st.markdown("""
-        <div style="background-color: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 12px; padding: 24px; text-align: center; color: #94A3B8;">
+        <div style="background-color: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 14px; padding: 24px; text-align: center; color: #94A3B8;">
             <p style="margin: 0; font-size: 0.92rem;">No recent files yet. Click any tool card above to start converting or editing documents.</p>
         </div>
         """, unsafe_allow_html=True)
@@ -789,16 +866,15 @@ if st.session_state.current_view == "dashboard":
 
 
 # =====================================================================
-# VIEW 2: BULK PPT TO PDF (CLEAN & COMPACT)
+# VIEW 2: BULK PPT TO PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "ppt2pdf":
-    render_workspace_header(
+    begin_unified_workspace(
         "Bulk PowerPoint to PDF",
         "Convert single presentations or scan an entire folder of 100+ files at native speed.",
         '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     tab_bulk, tab_upload = st.tabs(["📁 Bulk Folder Mode (Recommended for 100+ Presentations)", "📤 Upload Files via Browser"])
 
     with tab_bulk:
@@ -895,20 +971,19 @@ elif st.session_state.current_view == "ppt2pdf":
                         )
                     else:
                         st.error("Conversion failed. Please verify PowerPoint is available.")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 3: MERGE PDF
+# VIEW 3: MERGE PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "merge":
-    render_workspace_header(
+    begin_unified_workspace(
         "Merge PDF Files",
         "Combine multiple PDF documents into a single document in any desired order.",
         '<path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/><path d="M14 2V7H19"/><path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdfs = st.file_uploader("Select PDF files to merge (order matters):", type=["pdf"], accept_multiple_files=True, key="up_merge")
 
     if uploaded_pdfs:
@@ -943,20 +1018,19 @@ elif st.session_state.current_view == "merge":
                     )
         else:
             st.warning("Please upload at least 2 PDF files to merge.")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 4: SPLIT PDF
+# VIEW 4: SPLIT PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "split":
-    render_workspace_header(
+    begin_unified_workspace(
         "Split PDF Document",
         "Extract individual pages or custom page ranges into clean separate PDF documents.",
         '<path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/><line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to split:", type=["pdf"], key="up_split")
 
     if uploaded_pdf:
@@ -990,20 +1064,19 @@ elif st.session_state.current_view == "split":
                     mime="application/zip",
                     type="primary"
                 )
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 5: COMPRESS PDF
+# VIEW 5: COMPRESS PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "compress":
-    render_workspace_header(
+    begin_unified_workspace(
         "Compress PDF",
         "Shrink PDF file size while keeping text and graphic elements clear and readable.",
         '<path d="M4 14H10V20"/><path d="M10 14L3 21"/><path d="M20 10H14V4"/><path d="M14 10L21 3"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to compress:", type=["pdf"], key="up_comp")
 
     if uploaded_pdf:
@@ -1037,20 +1110,19 @@ elif st.session_state.current_view == "compress":
                     mime="application/pdf",
                     type="primary"
                 )
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 6: WORD TO PDF
+# VIEW 6: WORD TO PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "word2pdf":
-    render_workspace_header(
+    begin_unified_workspace(
         "Word to PDF Converter",
         "Convert Microsoft Word documents (.docx, .doc) to PDF with accurate fonts and margins.",
         '<path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15L10.5 12L12 15L13.5 12L15 15"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_words = st.file_uploader("Upload Word documents (.doc, .docx):", type=["doc", "docx"], accept_multiple_files=True, key="up_word")
 
     if uploaded_words:
@@ -1083,20 +1155,19 @@ elif st.session_state.current_view == "word2pdf":
                     st.download_button("📥 Download Converted PDFs (.ZIP)", data=zip_data, file_name="word_converted_pdfs.zip", mime="application/zip", type="primary")
                 else:
                     st.error("Conversion failed. Please verify Microsoft Word is available.")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 7: IMAGES TO PDF
+# VIEW 7: IMAGES TO PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "images2pdf":
-    render_workspace_header(
+    begin_unified_workspace(
         "Images to PDF Converter",
         "Merge JPG, PNG, WEBP, and BMP images into a unified, cleanly sized PDF file.",
         '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_imgs = st.file_uploader("Select images to combine (JPG, PNG, WEBP, BMP):", type=["jpg", "png", "webp", "jpeg", "bmp"], accept_multiple_files=True, key="up_i2p")
 
     if uploaded_imgs:
@@ -1119,20 +1190,19 @@ elif st.session_state.current_view == "images2pdf":
                 save_recent_file("images_combined.pdf", "Images to PDF", len(pdf_bytes) / 1024)
                 st.success("🎉 Combined PDF generated successfully!")
                 st.download_button("📥 Download Combined PDF", data=pdf_bytes, file_name="images_combined.pdf", mime="application/pdf", type="primary")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 8: PDF TO IMAGES
+# VIEW 8: PDF TO IMAGES (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "pdf2images":
-    render_workspace_header(
+    begin_unified_workspace(
         "PDF to Images Converter",
         "Convert each page of your PDF into crisp PNG or JPG images at custom resolution.",
         '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="1.5"/><path d="m8 18 3-3 4 4"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="up_p2i")
 
     if uploaded_pdf:
@@ -1160,20 +1230,19 @@ elif st.session_state.current_view == "pdf2images":
                 save_recent_file(uploaded_pdf.name, "PDF to Images", len(zip_data) / 1024)
                 st.success(f"🎉 Exported {len(imgs)} page(s) as images!")
                 st.download_button("📥 Download Images (.ZIP)", data=zip_data, file_name="pdf_pages_images.zip", mime="application/zip", type="primary")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 9: WATERMARK PDF
+# VIEW 9: WATERMARK PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "watermark":
-    render_workspace_header(
+    begin_unified_workspace(
         "Watermark PDF",
         "Add custom diagonal text watermarks across every page of your PDF.",
         '<circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="m4.93 4.93 14.14 14.14"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF to watermark:", type=["pdf"], key="up_wm")
 
     if uploaded_pdf:
@@ -1199,20 +1268,19 @@ elif st.session_state.current_view == "watermark":
                 save_recent_file(f"watermarked_{uploaded_pdf.name}", "Watermark PDF", len(wm_bytes) / 1024)
                 st.success("🎉 Watermark applied successfully!")
                 st.download_button("📥 Download Watermarked PDF", data=wm_bytes, file_name=f"watermarked_{uploaded_pdf.name}", mime="application/pdf", type="primary")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 10: PROTECT & UNLOCK
+# VIEW 10: PROTECT & UNLOCK (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "protect":
-    render_workspace_header(
+    begin_unified_workspace(
         "Protect & Unlock PDF",
         "Add 128-bit password encryption to your PDF or remove passwords from protected files.",
         '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     sec_action = st.radio("Choose Action:", ["Encrypt & Set Password", "Decrypt & Remove Password"], horizontal=True, key="sec_act_choice")
     uploaded_pdf = st.file_uploader("Upload PDF file:", type=["pdf"], key="up_sec")
 
@@ -1245,20 +1313,19 @@ elif st.session_state.current_view == "protect":
                             st.download_button("📥 Download Unlocked PDF", data=u_bytes, file_name=f"unlocked_{uploaded_pdf.name}", mime="application/pdf", type="primary")
                         else:
                             st.error("❌ Incorrect password or decryption failed.")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 11: EXTRACT CONTENT (ZERO WASTED SPACE)
+# VIEW 11: EXTRACT CONTENT (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "extract":
-    render_workspace_header(
+    begin_unified_workspace(
         "Extract Content (Text & Media)",
         "Extract all readable text to TXT or export all raw embedded images at original quality.",
         '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to extract from:", type=["pdf"], key="up_ext")
 
     if uploaded_pdf:
@@ -1297,20 +1364,19 @@ elif st.session_state.current_view == "extract":
                         st.download_button("📥 Download Extracted Images (.ZIP)", data=zip_data, file_name="extracted_images.zip", mime="application/zip", type="primary")
                     else:
                         st.info("No embedded raster images found in this PDF.")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 12: ROTATE PDF
+# VIEW 12: ROTATE PDF (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "rotate":
-    render_workspace_header(
+    begin_unified_workspace(
         "Rotate PDF Pages",
         "Permanently rotate page orientation by 90°, 180°, or 270° clockwise.",
         '<path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>'
     )
 
-    st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
     uploaded_pdf = st.file_uploader("Upload PDF file to rotate:", type=["pdf"], key="up_rot")
 
     if uploaded_pdf:
@@ -1329,40 +1395,20 @@ elif st.session_state.current_view == "rotate":
                 save_recent_file(f"rotated_{uploaded_pdf.name}", "Rotate PDF", len(rot_bytes) / 1024)
                 st.success("🎉 PDF rotated successfully!")
                 st.download_button("📥 Download Rotated PDF", data=rot_bytes, file_name=f"rotated_{uploaded_pdf.name}", mime="application/pdf", type="primary")
-    st.markdown('</div></div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 13: RECENT FILES (COMPACT & CLEAN)
+# VIEW 13: RECENT FILES (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view == "recent_view":
-    st.markdown('<div class="main-content-animated"><div style="max-width: 900px; margin: 0 auto;">', unsafe_allow_html=True)
-    
-    col_back, col_bread = st.columns([2.5, 7.5])
-    with col_back:
-        st.markdown('<div class="compact-back-btn">', unsafe_allow_html=True)
-        if st.button("← Back to Dashboard", key="b_rec"):
-            switch_view("dashboard")
-        st.markdown('</div>', unsafe_allow_html=True)
-    with col_bread:
-        st.markdown('<div style="text-align: right; padding-top: 6px; font-size: 0.85rem; color: #94A3B8;">Dashboard &nbsp;/&nbsp; <strong style="color: #0F172A;">Recent Files</strong></div>', unsafe_allow_html=True)
+    begin_unified_workspace(
+        "Recent Processed Files",
+        "History of all documents converted, merged, split, or compressed during your session.",
+        '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'
+    )
 
     recent_list = load_recent_files()
-
-    st.markdown("""
-    <div class="tool-hero-compact">
-        <div class="tool-hero-compact-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-            </svg>
-        </div>
-        <div>
-            <h1 class="tool-hero-compact-title">Recent Processed Files</h1>
-            <p class="tool-hero-compact-desc">History of all documents converted, merged, split, or compressed.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
 
     if not recent_list:
         st.markdown("""
@@ -1379,7 +1425,6 @@ elif st.session_state.current_view == "recent_view":
             if st.button("⚡ Explore Tools on Dashboard", type="primary", key="btn_empty_to_dash"):
                 switch_view("dashboard")
     else:
-        st.markdown('<div class="tool-action-panel">', unsafe_allow_html=True)
         col_t1, col_t2 = st.columns([8, 2])
         with col_t1:
             st.markdown(f"**Total Processed:** {len(recent_list)} document(s)")
@@ -1401,95 +1446,55 @@ elif st.session_state.current_view == "recent_view":
                 <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 500;">{item.get('timestamp', '')}</div>
             </div>
             """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    end_unified_workspace()
 
 
 # =====================================================================
-# VIEW 14: SETTINGS & HELP
+# VIEW 14: SETTINGS & HELP (UNIFIED WORKSPACE)
 # =====================================================================
 elif st.session_state.current_view in ("settings_view", "help_view"):
-    st.markdown('<div class="main-content-animated"><div style="max-width: 900px; margin: 0 auto;">', unsafe_allow_html=True)
-    
-    col_back, col_bread = st.columns([2.5, 7.5])
-    with col_back:
-        st.markdown('<div class="compact-back-btn">', unsafe_allow_html=True)
-        if st.button("← Back to Dashboard", key="b_sh"):
-            switch_view("dashboard")
-        st.markdown('</div>', unsafe_allow_html=True)
-
     if st.session_state.current_view == "settings_view":
-        with col_bread:
-            st.markdown('<div style="text-align: right; padding-top: 6px; font-size: 0.85rem; color: #94A3B8;">Dashboard &nbsp;/&nbsp; <strong style="color: #0F172A;">Settings</strong></div>', unsafe_allow_html=True)
+        begin_unified_workspace(
+            "Application Settings",
+            "Local engines, privacy parameters, and storage status.",
+            '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+        )
 
         st.markdown("""
-        <div class="tool-hero-compact">
-            <div class="tool-hero-compact-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                </svg>
-            </div>
-            <div>
-                <h1 class="tool-hero-compact-title">Application Settings</h1>
-                <p class="tool-hero-compact-desc">Local engines, privacy parameters, and storage status.</p>
-            </div>
+        <h4 style="margin-top: 0; color: #0F172A;">⚙️ Engine Status</h4>
+        <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span><strong>PowerPoint Engine:</strong> Native Microsoft PowerPoint COM</span>
+            <span style="color: #16A34A; font-weight: 700;">● Ready</span>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span><strong>Word Engine:</strong> Native Microsoft Word COM</span>
+            <span style="color: #16A34A; font-weight: 700;">● Ready</span>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span><strong>PDF Core Engine:</strong> PyMuPDF + PyPDF</span>
+            <span style="color: #16A34A; font-weight: 700;">● Ready</span>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between;">
+            <span><strong>Security Mode:</strong> 100% Offline / Local Sandboxing</span>
+            <span style="color: #16A34A; font-weight: 700;">● Active</span>
         </div>
         """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="tool-action-panel">
-            <h4 style="margin-top: 0; color: #0F172A;">⚙️ Engine Status</h4>
-            <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                <span><strong>PowerPoint Engine:</strong> Native Microsoft PowerPoint COM</span>
-                <span style="color: #16A34A; font-weight: 700;">● Ready</span>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                <span><strong>Word Engine:</strong> Native Microsoft Word COM</span>
-                <span style="color: #16A34A; font-weight: 700;">● Ready</span>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                <span><strong>PDF Core Engine:</strong> PyMuPDF + PyPDF</span>
-                <span style="color: #16A34A; font-weight: 700;">● Ready</span>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #ECEEF1; border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between;">
-                <span><strong>Security Mode:</strong> 100% Offline / Local Sandboxing</span>
-                <span style="color: #16A34A; font-weight: 700;">● Active</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        end_unified_workspace()
 
     else:
-        with col_bread:
-            st.markdown('<div style="text-align: right; padding-top: 6px; font-size: 0.85rem; color: #94A3B8;">Dashboard &nbsp;/&nbsp; <strong style="color: #0F172A;">Help</strong></div>', unsafe_allow_html=True)
+        begin_unified_workspace(
+            "Help & Pro Tips",
+            "Learn how to make the most of your offline PDF Master Toolkit.",
+            '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+        )
 
         st.markdown("""
-        <div class="tool-hero-compact">
-            <div class="tool-hero-compact-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                </svg>
-            </div>
-            <div>
-                <h1 class="tool-hero-compact-title">Help & Pro Tips</h1>
-                <p class="tool-hero-compact-desc">Learn how to make the most of your offline PDF Master Toolkit.</p>
-            </div>
-        </div>
+        <h4 style="margin-top: 0; color: #0F172A;">💡 Key Tips & Shortcuts</h4>
+        <ul style="color: #475569; font-size: 0.94rem; line-height: 1.7; padding-left: 20px;">
+            <li><strong>Converting 100+ PowerPoint files:</strong> Use <em>Bulk Folder Mode</em> in the Bulk PPT to PDF tool. It automatically loops through all subfolders at native hardware speed.</li>
+            <li><strong>Zero Internet Access:</strong> Every byte stays on your local disk. No files are uploaded to any external third-party server.</li>
+            <li><strong>Compressing without Quality Loss:</strong> The compression engine cleans redundant font tables and optimizes image streams without turning text blurry.</li>
+            <li><strong>Splitting by Range:</strong> Enter ranges like <code>1-3, 5, 8-12</code> in the Split tool to extract exactly the pages you need.</li>
+        </ul>
         """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="tool-action-panel">
-            <h4 style="margin-top: 0; color: #0F172A;">💡 Key Tips & Shortcuts</h4>
-            <ul style="color: #475569; font-size: 0.94rem; line-height: 1.7; padding-left: 20px;">
-                <li><strong>Converting 100+ PowerPoint files:</strong> Use <em>Bulk Folder Mode</em> in the Bulk PPT to PDF tool. It automatically loops through all subfolders at native hardware speed.</li>
-                <li><strong>Zero Internet Access:</strong> Every byte stays on your local disk. No files are uploaded to any external third-party server.</li>
-                <li><strong>Compressing without Quality Loss:</strong> The compression engine cleans redundant font tables and optimizes image streams without turning text blurry.</li>
-                <li><strong>Splitting by Range:</strong> Enter ranges like <code>1-3, 5, 8-12</code> in the Split tool to extract exactly the pages you need.</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown('</div></div>', unsafe_allow_html=True)
+        end_unified_workspace()
