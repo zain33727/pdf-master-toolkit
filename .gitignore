@@ -30,7 +30,8 @@ ENV/
 .venv/
 
 # Streamlit
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
 
 # Temporary / test outputs
 test_workspace/

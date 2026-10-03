@@ -7,7 +7,6 @@ Matching exact Document Automation Dashboard UI
 import os
 import io
 import json
-import time
 import zipfile
 import tempfile
 from datetime import datetime
@@ -60,7 +59,6 @@ def save_recent_file(filename: str, tool_name: str, file_size_kb: float):
         "size_kb": round(file_size_kb, 1),
         "timestamp": datetime.now().strftime("%b %d, %Y - %I:%M %p")
     }
-    # Keep up to 20 recent files, newest first
     recent.insert(0, entry)
     recent = recent[:20]
     try:
@@ -83,25 +81,16 @@ def get_zip_bytes(files_dict: dict):
 if "current_view" not in st.session_state:
     st.session_state.current_view = "dashboard"
 
-# Custom CSS for Pixel-Perfect Dashboard matching the user's design
+# Complete CSS Overrides to Force Light Theme and Exact Card Layout
 st.markdown("""
 <style>
-    /* Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: #FBFBFC;
-        color: #1E293B;
-    }
-
-    /* Main container padding */
-    .block-container {
-        padding-top: 1.8rem;
-        padding-bottom: 3rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        max-width: 1240px;
+    /* Force Light Mode Global Backgrounds */
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], .main, section.main {
+        background-color: #F8F9FA !important;
+        color: #1E293B !important;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
 
     /* Hide standard Streamlit header & footer */
@@ -109,133 +98,153 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #FFFFFF !important;
-        border-right: 1px solid #ECEEF1 !important;
-        padding-top: 1rem;
-    }
-    [data-testid="stSidebar"] .block-container {
-        padding-left: 1.2rem;
-        padding-right: 1.2rem;
+    /* Main container width & padding */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
+        max-width: 1260px !important;
+        background-color: #F8F9FA !important;
     }
 
-    /* Dark Pill Badge in Sidebar */
-    .sidebar-badge-container {
-        margin-bottom: 1.2rem;
-        margin-top: 0.2rem;
+    /* Sidebar Styling */
+    [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #ECEEF1 !important;
     }
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 1.5rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        background-color: #FFFFFF !important;
+    }
+
+    /* Dark Badge in Sidebar */
     .sidebar-badge {
         display: inline-block;
         background-color: #18181B;
         color: #FFFFFF;
-        font-size: 0.68rem;
+        font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         padding: 5px 12px;
         border-radius: 4px;
+        margin-bottom: 1.2rem;
     }
 
-    /* Primary Coral/Orange Buttons */
-    .coral-btn, .stButton>button[kind="primary"] {
+    /* Clean Sidebar Nav Buttons */
+    [data-testid="stSidebar"] .stButton > button {
+        background: transparent !important;
+        border: none !important;
+        color: #475569 !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        padding: 9px 14px !important;
+        font-weight: 500 !important;
+        font-size: 0.92rem !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        margin-bottom: 2px !important;
+        transition: all 0.15s ease !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background-color: #F8FAFC !important;
+        color: #FF5A36 !important;
+    }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+        background-color: #FFF0EB !important;
+        color: #FF5A36 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Card Containers (st.container with border=True) */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid #EAEBEF !important;
+        border-radius: 14px !important;
+        padding: 22px 20px 18px 20px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
+        min-height: 250px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        border-color: #FFD4C9 !important;
+        box-shadow: 0 6px 16px rgba(255, 90, 54, 0.08) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Icon Box Inside Cards */
+    .card-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background-color: #FFF0EB;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    .card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .card-desc {
+        font-size: 0.88rem;
+        color: #64748B;
+        line-height: 1.4;
+        margin-bottom: 16px;
+        min-height: 38px;
+    }
+
+    /* Primary Coral Buttons Inside Cards */
+    .stButton > button[kind="primary"] {
         background-color: #FF5A36 !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
         font-size: 0.92rem !important;
-        padding: 0.65rem 1.4rem !important;
+        padding: 0.65rem 1rem !important;
         width: 100% !important;
-        transition: all 0.2s ease !important;
         box-shadow: 0 1px 2px rgba(255, 90, 54, 0.2) !important;
+        transition: all 0.2s ease !important;
     }
-    .coral-btn:hover, .stButton>button[kind="primary"]:hover {
+    .stButton > button[kind="primary"]:hover {
         background-color: #E64724 !important;
         box-shadow: 0 4px 8px rgba(255, 90, 54, 0.3) !important;
-        transform: translateY(-1px);
     }
-    .coral-btn:active, .stButton>button[kind="primary"]:active {
-        transform: translateY(0);
-    }
-
-    /* Secondary Buttons */
-    .stButton>button[kind="secondary"] {
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        border: 1px solid #E2E8F0 !important;
-        background-color: #FFFFFF !important;
-        color: #334155 !important;
-    }
-    .stButton>button[kind="secondary"]:hover {
-        background-color: #F8FAFC !important;
-        border-color: #CBD5E1 !important;
+    .stButton > button[kind="primary"]:active {
+        transform: translateY(1px);
     }
 
-    /* Tool Card Style */
-    .tool-card {
-        background-color: #FFFFFF;
-        border: 1px solid #EAEBEF;
-        border-radius: 12px;
-        padding: 22px 24px;
-        min-height: 220px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        margin-bottom: 20px;
-    }
-    .tool-card:hover {
-        border-color: #FFD4C9;
-        box-shadow: 0 6px 16px rgba(255, 90, 54, 0.08);
-        transform: translateY(-2px);
-    }
-
-    /* Tool Icon Container */
-    .tool-icon-wrapper {
-        width: 52px;
-        height: 52px;
-        border-radius: 12px;
-        background-color: #FFF0EB;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 16px;
-    }
-
-    .tool-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 6px;
-    }
-
-    .tool-desc {
-        font-size: 0.88rem;
-        color: #6B7280;
-        line-height: 1.4;
-        margin-bottom: 18px;
-        min-height: 40px;
-    }
-
-    .tool-subtext {
+    .card-subtext {
         font-size: 0.8rem;
-        color: #9CA3AF;
+        color: #94A3B8;
         text-align: center;
         margin-top: 8px;
+        margin-bottom: 2px;
     }
 
-    /* Promo Card (Peach Background) */
-    .promo-card {
-        background-color: #FFF4EF;
+    /* Promo / Feature Card Styling */
+    .promo-container {
+        background-color: #FFF5F0;
         border: 1px solid #FFE4D9;
-        border-radius: 12px;
-        padding: 24px;
-        min-height: 220px;
-        margin-bottom: 20px;
+        border-radius: 14px;
+        padding: 24px 22px;
+        min-height: 250px;
+        box-sizing: border-box;
     }
-    .promo-icon-wrapper {
+    .promo-icon-box {
         width: 44px;
         height: 44px;
         border-radius: 10px;
@@ -243,19 +252,19 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
     .promo-title {
         font-size: 1.12rem;
         font-weight: 700;
         color: #111827;
-        margin-bottom: 14px;
+        margin-bottom: 16px;
         line-height: 1.35;
     }
     .promo-item {
         font-size: 0.88rem;
-        color: #374151;
-        margin-bottom: 8px;
+        color: #334155;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -266,14 +275,11 @@ st.markdown("""
         font-size: 1rem;
     }
 
-    /* Recent Files Header */
-    .recent-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 32px;
+    /* Recent Files Section */
+    .recent-section-header {
+        margin-top: 36px;
         margin-bottom: 16px;
-        padding-top: 16px;
+        padding-top: 18px;
         border-top: 1px solid #ECEEF1;
     }
     .recent-title {
@@ -281,45 +287,15 @@ st.markdown("""
         font-weight: 700;
         color: #111827;
     }
-    .recent-link {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #FF5A36;
-        text-decoration: none;
-        cursor: pointer;
-    }
 
-    /* Floating Action Button (FAB) */
-    .fab-btn {
-        position: fixed;
-        bottom: 24px;
-        right: 28px;
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
-        background-color: #FF5A36;
-        color: #FFFFFF;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(255, 90, 54, 0.4);
-        cursor: pointer;
-        z-index: 999;
-        transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-    .fab-btn:hover {
-        background-color: #E64724;
-        transform: scale(1.05);
-    }
-
-    /* Workspace Action Card */
+    /* Tool Workspace Panels */
     .action-panel {
         background: #FFFFFF;
         border: 1px solid #EAEBEF;
         border-radius: 14px;
         padding: 26px 30px;
-        margin-top: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        margin-top: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -329,13 +305,8 @@ st.markdown("""
 # SIDEBAR
 # =====================================================================
 with st.sidebar:
-    st.markdown("""
-    <div class="sidebar-badge-container">
-        <div class="sidebar-badge">DOCUMENT AUTOMATION</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-badge">DOCUMENT AUTOMATION</div>', unsafe_allow_html=True)
 
-    # Sidebar Navigation Buttons
     nav_items = [
         ("dashboard", "🏠 Dashboard"),
         ("merge", "📑 Merge PDF"),
@@ -343,7 +314,7 @@ with st.sidebar:
         ("compress", "🗜️ Compress PDF"),
         ("protect", "🔒 Protect PDF"),
         ("ppt2pdf", "📊 PPT to PDF"),
-        ("more_tools", "🛠️ More Tools (Images/Watermark)"),
+        ("more_tools", "🛠️ More Tools"),
     ]
 
     for key, label in nav_items:
@@ -353,9 +324,8 @@ with st.sidebar:
             st.session_state.current_view = key
             st.rerun()
 
-    st.markdown("<hr style='border: none; border-top: 1px solid #ECEEF1; margin: 24px 0 16px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: none; border-top: 1px solid #ECEEF1; margin: 20px 0 14px 0;'>", unsafe_allow_html=True)
 
-    # Bottom links
     if st.button("🕒 Recent Files", key="nav_recent", type="secondary"):
         st.session_state.current_view = "recent_view"
         st.rerun()
@@ -369,129 +339,118 @@ with st.sidebar:
         st.rerun()
 
 
-# Helper to navigate to a tool
 def switch_view(view_name):
     st.session_state.current_view = view_name
     st.rerun()
 
 
 # =====================================================================
-# VIEW 1: DASHBOARD (EXACT SCREENSHOT LAYOUT)
+# VIEW 1: DASHBOARD (EXACT SCREENSHOT LAYOUT - UNIFIED CARDS)
 # =====================================================================
 if st.session_state.current_view == "dashboard":
-    # 2 Rows of 3 Columns Grid
     # Row 1: Merge PDF, Split PDF, Compress PDF
-    col1, col2, col3 = st.columns(3, gap="medium")
+    c1, c2, c3 = st.columns(3, gap="medium")
 
-    with col1:
-        st.markdown("""
-        <div class="tool-card">
-            <div>
-                <div class="tool-icon-wrapper">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/>
-                        <path d="M14 2V7H19"/>
-                        <path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>
-                    </svg>
-                </div>
-                <div class="tool-title">Merge PDF</div>
-                <div class="tool-desc">Combine multiple PDF files into one.</div>
+    # Card 1: Merge PDF
+    with c1:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/>
+                    <path d="M14 2V7H19"/>
+                    <path d="M4 8H3C2.45 8 2 8.45 2 9V21C2 22.1 2.9 23 4 23H13C13.55 23 14 22.55 14 22V21"/>
+                </svg>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Select Files", key="btn_dash_merge", type="primary"):
-            switch_view("merge")
-        st.markdown('<div class="tool-subtext">No files selected</div>', unsafe_allow_html=True)
+            <div class="card-title">Merge PDF</div>
+            <div class="card-desc">Combine multiple PDF files into one.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select Files", key="btn_card_merge", type="primary"):
+                switch_view("merge")
+            st.markdown('<div class="card-subtext">No files selected</div>', unsafe_allow_html=True)
 
-    with col2:
-        st.markdown("""
-        <div class="tool-card">
-            <div>
-                <div class="tool-icon-wrapper">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
-                        <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>
-                    </svg>
-                </div>
-                <div class="tool-title">Split PDF</div>
-                <div class="tool-desc">Extract pages or split into multiple files.</div>
+    # Card 2: Split PDF
+    with c2:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
+                    <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>
+                </svg>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Select File", key="btn_dash_split", type="primary"):
-            switch_view("split")
-        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
+            <div class="card-title">Split PDF</div>
+            <div class="card-desc">Extract pages or split into multiple files.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_card_split", type="primary"):
+                switch_view("split")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
-    with col3:
-        st.markdown("""
-        <div class="tool-card">
-            <div>
-                <div class="tool-icon-wrapper">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 14H10V20"/>
-                        <path d="M10 14L3 21"/>
-                        <path d="M20 10H14V4"/>
-                        <path d="M14 10L21 3"/>
-                    </svg>
-                </div>
-                <div class="tool-title">Compress PDF</div>
-                <div class="tool-desc">Reduce file size while keeping quality.</div>
+    # Card 3: Compress PDF
+    with c3:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 14H10V20"/>
+                    <path d="M10 14L3 21"/>
+                    <path d="M20 10H14V4"/>
+                    <path d="M14 10L21 3"/>
+                </svg>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Select File", key="btn_dash_compress", type="primary"):
-            switch_view("compress")
-        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
+            <div class="card-title">Compress PDF</div>
+            <div class="card-desc">Reduce file size while keeping quality.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_card_compress", type="primary"):
+                switch_view("compress")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
     # Row 2: Protect PDF, PPT to PDF, Promo Banner Card
-    col4, col5, col6 = st.columns(3, gap="medium")
+    c4, c5, c6 = st.columns(3, gap="medium")
 
-    with col4:
-        st.markdown("""
-        <div class="tool-card">
-            <div>
-                <div class="tool-icon-wrapper">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                </div>
-                <div class="tool-title">Protect PDF</div>
-                <div class="tool-desc">Add a password and set permissions.</div>
+    # Card 4: Protect PDF
+    with c4:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Select File", key="btn_dash_protect", type="primary"):
-            switch_view("protect")
-        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
+            <div class="card-title">Protect PDF</div>
+            <div class="card-desc">Add a password and set permissions.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_card_protect", type="primary"):
+                switch_view("protect")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
-    with col5:
-        st.markdown("""
-        <div class="tool-card">
-            <div>
-                <div class="tool-icon-wrapper">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2"/>
-                        <line x1="8" y1="21" x2="16" y2="21"/>
-                        <line x1="12" y1="17" x2="12" y2="21"/>
-                        <path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>
-                    </svg>
-                </div>
-                <div class="tool-title">PPT to PDF</div>
-                <div class="tool-desc">Convert PowerPoint files to PDF.</div>
+    # Card 5: PPT to PDF
+    with c5:
+        with st.container(border=True):
+            st.markdown("""
+            <div class="card-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                    <path d="M9 8H12C12.8 8 13.5 8.7 13.5 9.5C13.5 10.3 12.8 11 12 11H9V13"/>
+                </svg>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Select File", key="btn_dash_ppt", type="primary"):
-            switch_view("ppt2pdf")
-        st.markdown('<div class="tool-subtext">No file selected</div>', unsafe_allow_html=True)
+            <div class="card-title">PPT to PDF</div>
+            <div class="card-desc">Convert PowerPoint files to PDF.</div>
+            """, unsafe_allow_html=True)
+            if st.button("Select File", key="btn_card_ppt", type="primary"):
+                switch_view("ppt2pdf")
+            st.markdown('<div class="card-subtext">No file selected</div>', unsafe_allow_html=True)
 
-    with col6:
+    # Card 6: Promo Value Banner Card
+    with c6:
         st.markdown("""
-        <div class="promo-card">
-            <div class="promo-icon-wrapper">
+        <div class="promo-container">
+            <div class="promo-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
                     <path d="M14 2V8H20"/>
@@ -510,7 +469,7 @@ if st.session_state.current_view == "dashboard":
     # RECENT FILES SECTION
     # -------------------------------------------------------------
     st.markdown("""
-    <div class="recent-header">
+    <div class="recent-section-header">
         <div class="recent-title">Recent Files</div>
     </div>
     """, unsafe_allow_html=True)
@@ -519,7 +478,7 @@ if st.session_state.current_view == "dashboard":
 
     if not recent_list:
         st.markdown("""
-        <div style="background-color: #FFFFFF; border: 1px dashed #E2E8F0; border-radius: 10px; padding: 30px; text-align: center; color: #94A3B8;">
+        <div style="background-color: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 10px; padding: 26px; text-align: center; color: #94A3B8;">
             <p style="margin: 0; font-size: 0.95rem;">No recent files yet. Select a tool above to start converting or processing your documents.</p>
         </div>
         """, unsafe_allow_html=True)
@@ -536,17 +495,7 @@ if st.session_state.current_view == "dashboard":
                 st.markdown(f"**{item['filename']}** &nbsp; <span style='background: #F1F5F9; color: #475569; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;'>{item['tool']}</span> &nbsp; <span style='color: #94A3B8; font-size: 0.8rem;'>{item['size_kb']} KB</span>", unsafe_allow_html=True)
             with c_time:
                 st.caption(item.get("timestamp", ""))
-            st.markdown("<hr style='border: none; border-top: 1px solid #F1F5F9; margin: 6px 0 10px 0;'>", unsafe_allow_html=True)
-
-    # Floating Action Button in bottom right
-    st.markdown("""
-    <a href="javascript:window.scrollTo(0,0);" class="fab-btn" title="Scroll to Top / Quick Action">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="7" y1="17" x2="17" y2="7"/>
-            <polyline points="7 7 17 7 17 17"/>
-        </svg>
-    </a>
-    """, unsafe_allow_html=True)
+            st.markdown("<hr style='border: none; border-top: 1px solid #F1F5F9; margin: 4px 0 8px 0;'>", unsafe_allow_html=True)
 
 
 # =====================================================================
@@ -560,7 +509,7 @@ elif st.session_state.current_view == "ppt2pdf":
 
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="tool-icon-wrapper" style="margin: 0;">
+        <div class="card-icon-box" style="margin: 0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="3" width="20" height="14" rx="2"/>
                 <line x1="8" y1="21" x2="16" y2="21"/>
@@ -569,8 +518,8 @@ elif st.session_state.current_view == "ppt2pdf":
             </svg>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">PowerPoint to PDF Converter</h2>
-            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Convert single files or scan an entire folder of 100+ presentations in seconds.</p>
+            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">PowerPoint to PDF Converter</h2>
+            <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Convert single presentations or scan an entire folder of 100+ files in seconds.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -691,7 +640,7 @@ elif st.session_state.current_view == "merge":
 
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="tool-icon-wrapper" style="margin: 0;">
+        <div class="card-icon-box" style="margin: 0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 2H14L19 7V17C19 18.1 18.1 19 17 19H8C6.9 19 6 18.1 6 17V4C6 2.9 6.9 2 8 2Z"/>
                 <path d="M14 2V7H19"/>
@@ -699,7 +648,7 @@ elif st.session_state.current_view == "merge":
             </svg>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Merge PDF Files</h2>
+            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">Merge PDF Files</h2>
             <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Combine two or more PDF documents into a single document.</p>
         </div>
     </div>
@@ -759,14 +708,14 @@ elif st.session_state.current_view == "split":
 
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="tool-icon-wrapper" style="margin: 0;">
+        <div class="card-icon-box" style="margin: 0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/>
                 <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/>
             </svg>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Split PDF</h2>
+            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">Split PDF</h2>
             <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Extract individual pages or custom page ranges into new documents.</p>
         </div>
     </div>
@@ -820,7 +769,7 @@ elif st.session_state.current_view == "compress":
 
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="tool-icon-wrapper" style="margin: 0;">
+        <div class="card-icon-box" style="margin: 0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 14H10V20"/>
                 <path d="M10 14L3 21"/>
@@ -829,7 +778,7 @@ elif st.session_state.current_view == "compress":
             </svg>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Compress PDF</h2>
+            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">Compress PDF</h2>
             <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Shrink PDF file size while preserving high visual fidelity.</p>
         </div>
     </div>
@@ -883,14 +832,14 @@ elif st.session_state.current_view == "protect":
 
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 14px; margin: 12px 0 20px 0;">
-        <div class="tool-icon-wrapper" style="margin: 0;">
+        <div class="card-icon-box" style="margin: 0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 1.6rem; color: #111827;">Protect & Unlock PDF</h2>
+            <h2 style="margin: 0; font-size: 1.55rem; color: #111827;">Protect & Unlock PDF</h2>
             <p style="margin: 0; color: #64748B; font-size: 0.92rem;">Add 128-bit password encryption or remove protection from your documents.</p>
         </div>
     </div>
@@ -945,7 +894,7 @@ elif st.session_state.current_view == "protect":
 
 
 # =====================================================================
-# VIEW 7: MORE TOOLS (IMAGES, WATERMARK, TEXT, ROTATE)
+# VIEW 7: MORE TOOLS
 # =====================================================================
 elif st.session_state.current_view == "more_tools":
     c_back, _ = st.columns([2, 8])
