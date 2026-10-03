@@ -189,72 +189,84 @@ st.markdown("""
         animation: springSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Clean Sidebar with Smooth Collapse and Open Support */
+    /* Sidebar Styling - Expanded (250px) & Collapsed Mini Rail Mode (68px / ~25%) */
     [data-testid="stSidebar"], section[data-testid="stSidebar"] {
         width: 250px !important;
         min-width: 250px !important;
         background-color: #FFFFFF !important;
         border-right: 1px solid #ECEEF1 !important;
-        z-index: 10 !important;
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), width 0.28s ease !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"], 
-    section[data-testid="stSidebar"][aria-expanded="false"] {
-        transform: translateX(-100%) !important;
-        min-width: 0 !important;
-        width: 0 !important;
+        z-index: 100 !important;
+        transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    /* Modern Sleek Collapse & Expand Toggle Buttons */
+    /* MINI RAIL MODE: When sidebar collapses, it shrinks to ~25% (68px) and stays pinned showing ONLY icons! */
+    [data-testid="stSidebar"][aria-expanded="false"], 
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        width: 68px !important;
+        min-width: 68px !important;
+        max-width: 68px !important;
+        transform: none !important;
+        display: block !important;
+        visibility: visible !important;
+        overflow: hidden !important;
+    }
+
+    /* In Mini Rail Mode: Hide all text labels, keep ONLY icons */
+    [data-testid="stSidebar"][aria-expanded="false"] .brand-text-block,
+    [data-testid="stSidebar"][aria-expanded="false"] .sidebar-caption {
+        display: none !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-container {
+        justify-content: center !important;
+        padding: 4px 0 16px 0 !important;
+        border-bottom: 1px solid #F1F5F9 !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .block-container {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+        padding-top: 1rem !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button {
+        justify-content: center !important;
+        padding: 0 !important;
+        width: 48px !important;
+        height: 44px !important;
+        margin: 0 auto 6px auto !important;
+        border-radius: 12px !important;
+    }
+    /* Hide text inside button in mini rail mode */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div[data-testid="stMarkdownContainer"],
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button p {
+        display: none !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span {
+        margin: 0 !important;
+        font-size: 1.25rem !important;
+    }
+
+    /* Collapse & Expand Toggle Buttons */
     [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="collapsedControl"] button {
+    [data-testid="stExpandSidebarButton"] button {
         background: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 8px !important;
-        color: #475569 !important;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
-        transition: all 0.2s ease !important;
-    }
-    /* Modern Sleek Collapse & Expand Toggle Buttons */
-    [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stExpandSidebarButton"] button,
-    [data-testid="collapsedControl"] button {
-        background: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 10px !important;
-        width: 38px !important;
-        height: 38px !important;
+        width: 32px !important;
+        height: 32px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         color: #475569 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
         cursor: pointer !important;
-        pointer-events: auto !important;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        transition: all 0.2s ease !important;
     }
     [data-testid="stSidebarCollapseButton"] button:hover,
-    [data-testid="stExpandSidebarButton"] button:hover,
-    [data-testid="collapsedControl"] button:hover {
+    [data-testid="stExpandSidebarButton"] button:hover {
         background: #F1F5F9 !important;
-        color: #0F172A !important;
-        border-color: #CBD5E1 !important;
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+        color: #FF5A36 !important;
+        border-color: #FFD2C7 !important;
     }
 
-    /* Position the reopen toggle cleanly at top-left */
-    [data-testid="stExpandSidebarButton"],
-    [data-testid="collapsedControl"] {
-        display: block !important;
-        position: fixed !important;
-        top: 14px !important;
-        left: 14px !important;
-        z-index: 999999 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
     [data-testid="stSidebar"] .block-container {
         padding-top: 1.5rem !important;
         padding-left: 1.1rem !important;
@@ -695,7 +707,7 @@ with st.sidebar:
                 <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
         </div>
-        <div>
+        <div class="brand-text-block">
             <div class="brand-name">PDF Master</div>
             <div class="brand-tag">TOOLKIT</div>
         </div>
@@ -703,21 +715,20 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     nav_links = [
-        ("dashboard", "🏠  Dashboard"),
-        ("recent_view", "🕒  Recent Files"),
-        ("settings_view", "⚙️  Settings"),
-        ("help_view", "❓  Help & Pro Tips"),
+        ("dashboard", "🏠", "Dashboard"),
+        ("recent_view", "🕒", "Recent Files"),
+        ("settings_view", "⚙️", "Settings"),
+        ("help_view", "❓", "Help & Pro Tips"),
     ]
 
-    for key, label in nav_links:
+    for key, icon, label in nav_links:
         is_active = (st.session_state.current_view == key)
         btn_type = "primary" if is_active else "secondary"
-        if st.button(label, key=f"nav_{key}", type=btn_type):
+        if st.button(label, key=f"nav_{key}", type=btn_type, icon=icon, help=label):
             st.session_state.current_view = key
             st.rerun()
 
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-    st.caption("100% Offline & Private Local Engine")
+    st.markdown("<div style='height: 24px;'></div><div class='sidebar-caption' style='font-size: 0.78rem; color: #94A3B8; padding: 0 4px;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
 
 
 def switch_view(view_name):
