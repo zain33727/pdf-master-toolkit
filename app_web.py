@@ -102,12 +102,19 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
 
-    #MainMenu, footer, header, [data-testid="stHeader"], [data-testid="stDecoration"], [data-testid="stToolbar"] {
+    #MainMenu, footer, [data-testid="stDecoration"], [data-testid="stToolbar"], [data-testid="stStatusWidget"] {
         display: none !important;
+    }
+
+    header, [data-testid="stHeader"] {
+        background: transparent !important;
         height: 0px !important;
-        visibility: hidden !important;
+        min-height: 0px !important;
         padding: 0 !important;
         margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        pointer-events: none !important;
     }
 
     /* Ambient Floating Blurred PDF Elements in Background */
@@ -224,7 +231,31 @@ st.markdown("""
         position: fixed !important;
         top: 14px !important;
         left: 14px !important;
-        z-index: 99 !important;
+        z-index: 999999 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+    [data-testid="collapsedControl"] button {
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 10px !important;
+        width: 38px !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #475569 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    [data-testid="collapsedControl"] button:hover {
+        background: #F1F5F9 !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
     }
     [data-testid="stSidebar"] .block-container {
         padding-top: 1.5rem !important;
