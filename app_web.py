@@ -93,6 +93,9 @@ def get_zip_bytes(files_dict: dict):
 if "current_view" not in st.session_state:
     st.session_state.current_view = "dashboard"
 
+if "sidebar_mini" not in st.session_state:
+    st.session_state.sidebar_mini = False
+
 # High-End Styling: Ambient Blurred PDF Motion, Zero Disjointed Boxes, Unified Single-Card Workspaces
 st.markdown("""
 <style>
@@ -189,89 +192,18 @@ st.markdown("""
         animation: springSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Sidebar Styling - Expanded (250px) & Collapsed Mini Rail Mode (68px / ~25%) */
+    /* Hide Streamlit default collapse/expand chevron icons to avoid glitchy 0px collapse */
+    [data-testid="stSidebarCollapseButton"], 
+    [data-testid="stExpandSidebarButton"], 
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+
     [data-testid="stSidebar"], section[data-testid="stSidebar"] {
-        width: 250px !important;
-        min-width: 250px !important;
         background-color: #FFFFFF !important;
         border-right: 1px solid #ECEEF1 !important;
         z-index: 100 !important;
         transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-
-    /* MINI RAIL MODE: When sidebar collapses, it shrinks to ~25% (68px) and stays pinned showing ONLY icons! */
-    [data-testid="stSidebar"][aria-expanded="false"], 
-    section[data-testid="stSidebar"][aria-expanded="false"] {
-        width: 68px !important;
-        min-width: 68px !important;
-        max-width: 68px !important;
-        transform: none !important;
-        display: block !important;
-        visibility: visible !important;
-        overflow: hidden !important;
-    }
-
-    /* In Mini Rail Mode: Hide all text labels, keep ONLY icons */
-    [data-testid="stSidebar"][aria-expanded="false"] .brand-text-block,
-    [data-testid="stSidebar"][aria-expanded="false"] .sidebar-caption {
-        display: none !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-container {
-        justify-content: center !important;
-        padding: 4px 0 16px 0 !important;
-        border-bottom: 1px solid #F1F5F9 !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] .block-container {
-        padding-left: 6px !important;
-        padding-right: 6px !important;
-        padding-top: 1rem !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button {
-        justify-content: center !important;
-        padding: 0 !important;
-        width: 48px !important;
-        height: 44px !important;
-        margin: 0 auto 6px auto !important;
-        border-radius: 12px !important;
-    }
-    /* Hide text inside button in mini rail mode */
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div[data-testid="stMarkdownContainer"],
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button p {
-        display: none !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span {
-        margin: 0 !important;
-        font-size: 1.25rem !important;
-    }
-
-    /* Collapse & Expand Toggle Buttons */
-    [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stExpandSidebarButton"] button {
-        background: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 8px !important;
-        width: 32px !important;
-        height: 32px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        color: #475569 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-        cursor: pointer !important;
-        transition: all 0.2s ease !important;
-    }
-    [data-testid="stSidebarCollapseButton"] button:hover,
-    [data-testid="stExpandSidebarButton"] button:hover {
-        background: #F1F5F9 !important;
-        color: #FF5A36 !important;
-        border-color: #FFD2C7 !important;
-    }
-
-    [data-testid="stSidebar"] .block-container {
-        padding-top: 1.5rem !important;
-        padding-left: 1.1rem !important;
-        padding-right: 1.1rem !important;
-        background-color: #FFFFFF !important;
     }
 
     /* Brand Logo Component */
@@ -279,9 +211,6 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 4px 6px 16px 6px;
-        border-bottom: 1px solid #F1F5F9;
-        margin-bottom: 16px;
     }
     .brand-logo-icon {
         width: 38px;
@@ -312,46 +241,38 @@ st.markdown("""
         letter-spacing: 0.08em;
     }
 
-    /* Sidebar Navigation Links */
-    [data-testid="stSidebar"] .stButton > button {
+    /* Sidebar Toggle Buttons (« and ») */
+    div[class*="st-key-toggle_sidebar"] .stButton > button,
+    .st-key-toggle_sidebar_mini button,
+    .st-key-toggle_sidebar_expand button {
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: flex-start !important;
-        width: 100% !important;
-        height: 42px !important;
-        padding: 0 14px !important;
-        border: 1px solid transparent !important;
-        border-radius: 10px !important;
-        font-size: 0.92rem !important;
-        font-weight: 500 !important;
+        justify-content: center !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        background: #FFFFFF !important;
         color: #475569 !important;
-        background: transparent !important;
-        white-space: nowrap !important;
-        box-shadow: none !important;
-        margin-bottom: 4px !important;
-        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    /* Sleek, calm, premium neutral hover - no loud jarring red text */
-    [data-testid="stSidebar"] .stButton > button:hover {
-        background-color: #F1F5F9 !important;
-        color: #0F172A !important;
-        font-weight: 600 !important;
-        border-color: #E2E8F0 !important;
-        transform: translateX(2px) !important;
-    }
-    /* Active Link - Clean subtle coral pill with soft highlight */
-    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background-color: #FFF2ED !important;
-        color: #FF5A36 !important;
+        font-size: 1.1rem !important;
         font-weight: 700 !important;
-        border-color: #FFDCD3 !important;
-        box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
+        line-height: 1 !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.18s ease !important;
     }
-    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-        background-color: #FFEAE2 !important;
-        color: #E64724 !important;
-        border-color: #FFCFC2 !important;
+    div[class*="st-key-toggle_sidebar"] .stButton > button:hover,
+    .st-key-toggle_sidebar_mini button:hover,
+    .st-key-toggle_sidebar_expand button:hover {
+        background: #F1F5F9 !important;
+        color: #FF5A36 !important;
+        border-color: #FFD2C7 !important;
+        transform: scale(1.06) !important;
     }
+
 
     /* Main Container */
     .block-container {
@@ -446,8 +367,9 @@ st.markdown("""
         margin-top: 6px;
     }
 
-    /* Primary Coral Buttons */
-    .stButton > button[kind="primary"] {
+    /* Primary Coral Buttons (Workspaces and Main Area) */
+    section.main .stButton > button[kind="primary"],
+    .main .stButton > button[kind="primary"] {
         background-color: #FF5A36 !important;
         color: #FFFFFF !important;
         border: none !important;
@@ -459,12 +381,14 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(255, 90, 54, 0.22) !important;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
-    .stButton > button[kind="primary"]:hover {
+    section.main .stButton > button[kind="primary"]:hover,
+    .main .stButton > button[kind="primary"]:hover {
         background-color: #E64724 !important;
         box-shadow: 0 6px 14px rgba(255, 90, 54, 0.32) !important;
         transform: translateY(-1px);
     }
-    .stButton > button[kind="primary"]:active {
+    section.main .stButton > button[kind="primary"]:active,
+    .main .stButton > button[kind="primary"]:active {
         transform: scale(0.98);
     }
 
@@ -698,37 +622,199 @@ st.markdown("""
 # MINIMAL SLEEK SIDEBAR
 # =====================================================================
 with st.sidebar:
-    st.markdown("""
-    <div class="brand-logo-container">
-        <div class="brand-logo-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
-                <path d="M14 3V8H19" fill="#FED7C7"/>
-                <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+    if not st.session_state.sidebar_mini:
+        # EXPANDED MODE: Beautiful 250px clean sidebar (no borders, soft hover, soft peach active pill)
+        st.markdown("""
+        <style>
+            [data-testid="stSidebar"], section[data-testid="stSidebar"] {
+                width: 250px !important;
+                min-width: 250px !important;
+                max-width: 250px !important;
+            }
+            [data-testid="stSidebar"] .block-container {
+                padding-top: 1.4rem !important;
+                padding-left: 1.1rem !important;
+                padding-right: 1.1rem !important;
+            }
+            [data-testid="stSidebar"] .stButton > button {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                width: 100% !important;
+                height: 42px !important;
+                padding: 0 14px !important;
+                border: none !important;
+                outline: none !important;
+                border-radius: 10px !important;
+                font-size: 0.92rem !important;
+                font-weight: 500 !important;
+                color: #475569 !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                white-space: nowrap !important;
+                box-shadow: none !important;
+                margin-bottom: 4px !important;
+                transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button:hover {
+                background-color: #F1F5F9 !important;
+                color: #0F172A !important;
+                font-weight: 600 !important;
+                border: none !important;
+                transform: translateX(2px) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+                background-color: #FFF2ED !important;
+                background: #FFF2ED !important;
+                color: #FF5A36 !important;
+                font-weight: 700 !important;
+                border: 1px solid #FFDCD3 !important;
+                box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+                background-color: #FFEAE2 !important;
+                background: #FFEAE2 !important;
+                color: #E64724 !important;
+                border-color: #FFCFC2 !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+        col_brand, col_tog = st.columns([4, 1])
+        with col_brand:
+            st.markdown("""
+            <div style="display: flex; align-items: center; gap: 10px; padding: 2px 0 6px 0;">
+                <div class="brand-logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
+                        <path d="M14 3V8H19" fill="#FED7C7"/>
+                        <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="brand-text-block">
+                    <div class="brand-name">PDF Master</div>
+                    <div class="brand-tag">TOOLKIT</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_tog:
+            st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+            if st.button("«", key="toggle_sidebar_mini", help="Collapse sidebar to 25% mini rail"):
+                st.session_state.sidebar_mini = True
+                st.rerun()
+
+        st.markdown("<div style='height: 1px; background: #F1F5F9; margin: 6px 0 14px 0;'></div>", unsafe_allow_html=True)
+
+        nav_links = [
+            ("dashboard", "🏠  Dashboard"),
+            ("recent_view", "🕒  Recent Files"),
+            ("settings_view", "⚙️  Settings"),
+            ("help_view", "❓  Help & Pro Tips"),
+        ]
+
+        for key, label in nav_links:
+            is_active = (st.session_state.current_view == key)
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(label, key=f"nav_{key}", type=btn_type):
+                st.session_state.current_view = key
+                st.rerun()
+
+        st.markdown("<div style='height: 24px;'></div><div style='font-size: 0.78rem; color: #94A3B8; padding: 0 4px;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
+
+    else:
+        # MINI RAIL MODE: 25% width (72px), centered icons ONLY, zero clipped text
+        st.markdown("""
+        <style>
+            [data-testid="stSidebar"], section[data-testid="stSidebar"] {
+                width: 72px !important;
+                min-width: 72px !important;
+                max-width: 72px !important;
+            }
+            [data-testid="stSidebar"] .block-container {
+                padding-top: 1rem !important;
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+            [data-testid="stSidebar"] .stButton > button {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 44px !important;
+                height: 44px !important;
+                min-width: 44px !important;
+                max-width: 44px !important;
+                padding: 0 !important;
+                margin: 0 auto 8px auto !important;
+                border: none !important;
+                outline: none !important;
+                border-radius: 12px !important;
+                font-size: 1.25rem !important;
+                color: #475569 !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button:hover {
+                background-color: #F1F5F9 !important;
+                color: #0F172A !important;
+                border: none !important;
+                transform: scale(1.08) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+                background-color: #FFF2ED !important;
+                background: #FFF2ED !important;
+                color: #FF5A36 !important;
+                border: 1.5px solid #FFDCD3 !important;
+                box-shadow: 0 2px 6px rgba(255, 90, 54, 0.12) !important;
+            }
+            [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+                background-color: #FFEAE2 !important;
+                background: #FFEAE2 !important;
+                color: #E64724 !important;
+                border-color: #FFCFC2 !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+        col_exp, = st.columns([1])
+        with col_exp:
+            if st.button("»", key="toggle_sidebar_expand", help="Expand sidebar"):
+                st.session_state.sidebar_mini = False
+                st.rerun()
+
+        st.markdown("""
+        <div style="display: flex; justify-content: center; margin: 10px 0 14px 0; padding-bottom: 12px; border-bottom: 1px solid #F1F5F9;" title="PDF Master Toolkit">
+            <div class="brand-logo-icon" style="width: 38px; height: 38px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
+                    <path d="M14 3V8H19" fill="#FED7C7"/>
+                    <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+            </div>
         </div>
-        <div class="brand-text-block">
-            <div class="brand-name">PDF Master</div>
-            <div class="brand-tag">TOOLKIT</div>
+        """, unsafe_allow_html=True)
+
+        mini_links = [
+            ("dashboard", "🏠", "Dashboard"),
+            ("recent_view", "🕒", "Recent Files"),
+            ("settings_view", "⚙️", "Settings"),
+            ("help_view", "❓", "Help & Pro Tips"),
+        ]
+
+        for key, icon, name in mini_links:
+            is_active = (st.session_state.current_view == key)
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(icon, key=f"nav_mini_{key}", type=btn_type, help=name):
+                st.session_state.current_view = key
+                st.rerun()
+
+        st.markdown("""
+        <div style="margin-top: 24px; display: flex; justify-content: center;" title="100% Offline & Private Local Engine">
+            <span style="font-size: 1.1rem; opacity: 0.6; cursor: help;">🔒</span>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    nav_links = [
-        ("dashboard", "🏠", "Dashboard"),
-        ("recent_view", "🕒", "Recent Files"),
-        ("settings_view", "⚙️", "Settings"),
-        ("help_view", "❓", "Help & Pro Tips"),
-    ]
-
-    for key, icon, label in nav_links:
-        is_active = (st.session_state.current_view == key)
-        btn_type = "primary" if is_active else "secondary"
-        if st.button(label, key=f"nav_{key}", type=btn_type, icon=icon, help=label):
-            st.session_state.current_view = key
-            st.rerun()
-
-    st.markdown("<div style='height: 24px;'></div><div class='sidebar-caption' style='font-size: 0.78rem; color: #94A3B8; padding: 0 4px;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
 
 
 def switch_view(view_name):
