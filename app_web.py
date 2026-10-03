@@ -174,10 +174,10 @@ st.markdown("""
         70% { opacity: 0.9; transform: translateY(-2px) scale(1.002); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .page-animated {
+    .main .block-container {
         position: relative;
         z-index: 1;
-        animation: springSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: springSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Pinned Clean Sidebar */
@@ -304,6 +304,7 @@ st.markdown("""
     }
 
     /* Dashboard Card Containers */
+    div[data-testid="stColumn"] [data-testid="stVerticalBlockBorderWrapper"],
     .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
         border: 1px solid #ECEEF1 !important;
@@ -317,6 +318,7 @@ st.markdown("""
         justify-content: space-between !important;
         margin-bottom: 16px !important;
     }
+    div[data-testid="stColumn"] [data-testid="stVerticalBlockBorderWrapper"]:hover,
     .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"]:hover {
         border-color: #FFD2C7 !important;
         box-shadow: 0 10px 24px rgba(255, 90, 54, 0.12) !important;
@@ -334,6 +336,7 @@ st.markdown("""
         margin-bottom: 14px;
         transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    div[data-testid="stColumn"] [data-testid="stVerticalBlockBorderWrapper"]:hover .card-icon-box,
     .dash-grid-card [data-testid="stVerticalBlockBorderWrapper"]:hover .card-icon-box {
         transform: scale(1.1) rotate(-2deg);
         background-color: #FFE4DC;
@@ -382,94 +385,166 @@ st.markdown("""
         transform: scale(0.98);
     }
 
-    /* UNIFIED SINGLE-CARD TOOL WORKSPACE (NO EXTRA OR DISJOINTED BOXES!) */
-    .unified-workspace-card {
-        background: #FFFFFF;
-        border: 1px solid #ECEEF1;
-        border-radius: 18px;
-        padding: 26px 32px 34px 32px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
-        max-width: 900px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
+    /* Sleek Back Button */
+    div[class*="st-key-b_"] .stButton > button {
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 9px !important;
+        color: #475569 !important;
+        font-weight: 600 !important;
+        font-size: 0.86rem !important;
+        padding: 0.45rem 1.15rem !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        width: auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+    div[class*="st-key-b_"] .stButton > button:hover {
+        background-color: #F8FAFC !important;
+        border-color: #CBD5E1 !important;
+        color: #FF5A36 !important;
+        transform: translateX(-3px) !important;
+        box-shadow: 0 3px 8px rgba(255, 90, 54, 0.12) !important;
     }
 
-    /* Workspace Top Navigation Row */
-    .ws-top-nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid #F1F5F9;
-    }
-    .ws-back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.88rem;
-        font-weight: 600;
-        color: #475569;
-        text-decoration: none;
-        cursor: pointer;
-        transition: color 0.15s ease;
-    }
-    .ws-back-link:hover {
-        color: #FF5A36;
-    }
+    /* Breadcrumbs */
     .ws-breadcrumb {
-        font-size: 0.85rem;
+        font-size: 0.86rem;
         color: #94A3B8;
+        text-align: right;
+        padding-top: 8px;
         font-weight: 500;
     }
     .ws-breadcrumb strong {
         color: #0F172A;
+        font-weight: 700;
     }
 
-    /* Workspace Hero Header */
+    /* Workspace Hero Header Card */
     .ws-hero {
         display: flex;
         align-items: center;
-        gap: 18px;
-        margin-bottom: 24px;
+        gap: 16px;
+        margin-top: 10px;
+        margin-bottom: 22px;
+        padding: 16px 22px;
+        background: #FFFFFF;
+        border: 1px solid #ECEEF1;
+        border-radius: 14px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
     .ws-hero-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-        background-color: #FFF0EB;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #FFF0EB 0%, #FFE4DC 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(255, 90, 54, 0.1);
     }
     .ws-hero-title {
-        font-size: 1.55rem;
-        font-weight: 800;
-        color: #0F172A;
-        margin: 0 0 4px 0;
-        letter-spacing: -0.015em;
+        font-size: 1.45rem !important;
+        font-weight: 800 !important;
+        color: #0F172A !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        letter-spacing: -0.02em !important;
+        line-height: 1.2 !important;
     }
     .ws-hero-desc {
-        font-size: 0.92rem;
-        color: #64748B;
-        margin: 0;
-        line-height: 1.4;
+        font-size: 0.88rem !important;
+        color: #64748B !important;
+        margin: 3px 0 0 0 !important;
+        line-height: 1.35 !important;
+    }
+
+    /* Modern Segmented Pill Tabs */
+    div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+        gap: 8px !important;
+        background-color: #F1F5F9 !important;
+        padding: 5px !important;
+        border-radius: 12px !important;
+        border-bottom: none !important;
+        display: inline-flex !important;
+        width: auto !important;
+        margin-bottom: 20px !important;
+    }
+    div[data-testid="stTabs"] [data-baseweb="tab"] {
+        height: 38px !important;
+        border-radius: 8px !important;
+        padding: 0 16px !important;
+        font-size: 0.88rem !important;
+        font-weight: 600 !important;
+        color: #64748B !important;
+        background-color: transparent !important;
+        border: none !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    div[data-testid="stTabs"] [data-baseweb="tab"]:hover {
+        color: #0F172A !important;
+    }
+    div[data-testid="stTabs"] [aria-selected="true"] {
+        background-color: #FFFFFF !important;
+        color: #FF5A36 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+    }
+    div[data-testid="stTabs"] [data-baseweb="tab-border"] {
+        display: none !important;
+    }
+    div[data-testid="stTabs"] [data-baseweb="tab-highlight"] {
+        display: none !important;
+    }
+
+    /* Modern Crisp Form Inputs */
+    div[data-testid="stTextInput"] input,
+    div[data-testid="stNumberInput"] input {
+        background-color: #FFFFFF !important;
+        border: 1.5px solid #E2E8F0 !important;
+        border-radius: 10px !important;
+        color: #0F172A !important;
+        font-size: 0.92rem !important;
+        padding: 10px 14px !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stTextInput"] input:focus,
+    div[data-testid="stNumberInput"] input:focus {
+        border-color: #FF5A36 !important;
+        box-shadow: 0 0 0 3px rgba(255, 90, 54, 0.15) !important;
+    }
+    div[data-testid="stSelectbox"] > div > div {
+        background-color: #FFFFFF !important;
+        border: 1.5px solid #E2E8F0 !important;
+        border-radius: 10px !important;
+    }
+
+    /* Checkbox Alignment & Styling */
+    div[data-testid="stCheckbox"] {
+        margin-top: 8px !important;
+        margin-bottom: 8px !important;
+    }
+    div[data-testid="stCheckbox"] label {
+        font-size: 0.92rem !important;
+        font-weight: 500 !important;
+        color: #334155 !important;
     }
 
     /* Styled Drag & Drop File Zone */
     [data-testid="stFileUploader"] {
         background-color: #FAFAFC !important;
-        border: 1.5px dashed #CBD5E1 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
+        border: 2px dashed #CBD5E1 !important;
+        border-radius: 14px !important;
+        padding: 24px !important;
+        text-align: center !important;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FF5A36 !important;
         background-color: #FFF9F7 !important;
-        transform: scale(1.003);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 90, 54, 0.08) !important;
     }
     [data-testid="stFileUploader"] button {
         background-color: #FFFFFF !important;
@@ -580,20 +655,18 @@ def switch_view(view_name):
 
 
 def begin_unified_workspace(title: str, description: str, svg_path: str):
-    """Renders the top bar and hero inside ONE unified card container with zero disjointed boxes."""
-    st.markdown('<div class="page-animated"><div class="unified-workspace-card">', unsafe_allow_html=True)
-    
+    """Renders the top navigation bar and hero header with clean alignment and zero disjointed boxes."""
     col_back, col_bread = st.columns([3, 7])
     with col_back:
         if st.button("← Back to Dashboard", key=f"b_{st.session_state.current_view}"):
             switch_view("dashboard")
     with col_bread:
-        st.markdown(f'<div style="text-align: right; padding-top: 6px; font-size: 0.85rem; color: #94A3B8;">Dashboard &nbsp;/&nbsp; <strong style="color: #0F172A;">{title}</strong></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="ws-breadcrumb">Dashboard &nbsp;/&nbsp; <strong>{title}</strong></div>', unsafe_allow_html=True)
 
     st.markdown(f"""
     <div class="ws-hero">
         <div class="ws-hero-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF5A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 {svg_path}
             </svg>
         </div>
@@ -606,20 +679,17 @@ def begin_unified_workspace(title: str, description: str, svg_path: str):
 
 
 def end_unified_workspace():
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)
 
 
 # =====================================================================
 # VIEW 1: DASHBOARD (ALL 10+ REAL TOOLS WITH SPRING HOVER PHYSICS)
 # =====================================================================
 if st.session_state.current_view == "dashboard":
-    st.markdown('<div class="page-animated">', unsafe_allow_html=True)
     st.markdown("""
     <div class="dash-header-title">PDF Master Toolkit</div>
     <div class="dash-header-sub">All-in-one offline workspace • 100% private processing on your local machine</div>
     """, unsafe_allow_html=True)
-
-    st.markdown('<div class="dash-grid-card">', unsafe_allow_html=True)
 
     # ROW 1: Bulk PPT to PDF, Merge PDF, Split PDF
     r1c1, r1c2, r1c3 = st.columns(3, gap="medium")
@@ -830,8 +900,6 @@ if st.session_state.current_view == "dashboard":
     with r4c3:
         pass
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
     # Recent Files Preview at Bottom of Dashboard
     st.markdown("""
     <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #ECEEF1;">
@@ -862,8 +930,6 @@ if st.session_state.current_view == "dashboard":
                 st.caption(item.get("timestamp", ""))
             st.markdown("<hr style='border: none; border-top: 1px solid #F1F5F9; margin: 4px 0 8px 0;'>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
 
 # =====================================================================
 # VIEW 2: BULK PPT TO PDF (UNIFIED WORKSPACE)
@@ -878,16 +944,22 @@ elif st.session_state.current_view == "ppt2pdf":
     tab_bulk, tab_upload = st.tabs(["📁 Bulk Folder Mode (Recommended for 100+ Presentations)", "📤 Upload Files via Browser"])
 
     with tab_bulk:
-        st.caption("Point to any folder on your computer containing .ppt, .pptx, .pps, or .ppsx files.")
-        folder_input = st.text_input(
-            "Folder path on your computer:",
-            placeholder=r"C:\Users\username\Desktop\Presentations"
-        )
-        c_sub, c_out = st.columns(2)
-        with c_sub:
-            recursive_check = st.checkbox("Scan subfolders recursively", value=True)
+        st.caption("Point to any folder on your computer containing .ppt, .pptx, .pps, or .ppsx files to batch convert.")
+        c_in, c_out = st.columns(2, gap="medium")
+        with c_in:
+            folder_input = st.text_input(
+                "📁 Source Presentations Folder:",
+                placeholder=r"C:\Users\username\Desktop\Presentations",
+                help="Folder containing .pptx, .ppt, .pps, or .ppsx files"
+            )
         with c_out:
-            dest_folder = st.text_input("Custom Output Directory (Leave empty to save alongside originals):", "")
+            dest_folder = st.text_input(
+                "📂 Custom Output Directory (Optional):",
+                placeholder=r"Leave blank to save alongside originals",
+                help="Where converted PDF files will be stored"
+            )
+        
+        recursive_check = st.checkbox("Scan all subfolders recursively", value=True)
 
         if folder_input:
             if os.path.isdir(folder_input):
