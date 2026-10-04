@@ -192,20 +192,19 @@ st.markdown("""
         animation: springSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Hide Streamlit default collapse/expand chevron icons to avoid glitchy 0px collapse */
-    [data-testid="stSidebarCollapseButton"], 
-    [data-testid="stExpandSidebarButton"], 
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-
+    /* =========================================================================
+       SIDEBAR CONTAINER & SCROLLBAR CONTROL
+       ========================================================================= */
     [data-testid="stSidebar"], section[data-testid="stSidebar"] {
+        width: 240px !important;
+        min-width: 240px !important;
         background-color: #FFFFFF !important;
         border-right: 1px solid #ECEEF1 !important;
         z-index: 100 !important;
-        transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
         overflow: hidden !important;
         overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stSidebar"]::-webkit-scrollbar,
     [data-testid="stSidebar"] *::-webkit-scrollbar {
@@ -214,76 +213,361 @@ st.markdown("""
         height: 0 !important;
     }
 
+    /* =========================================================================
+       EXPANDED STATE (DEFAULT & aria-expanded="true")
+       ========================================================================= */
+    [data-testid="stSidebar"], 
+    [data-testid="stSidebar"][aria-expanded="true"], 
+    section[data-testid="stSidebar"][aria-expanded="true"] {
+        width: 240px !important;
+        min-width: 240px !important;
+        max-width: 240px !important;
+        transform: none !important;
+    }
 
-    /* Brand Logo Component */
+    [data-testid="stSidebar"] [data-testid="stSidebarContent"],
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 1.4rem !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Brand Logo Component - Expanded */
     .brand-logo-container {
         display: flex;
         align-items: center;
         gap: 12px;
+        padding: 2px 4px 6px 4px;
+        margin-bottom: 2px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .brand-logo-icon {
         width: 38px;
         height: 38px;
+        min-width: 38px;
+        min-height: 38px;
         border-radius: 10px;
         background: linear-gradient(135deg, #FF6B4A 0%, #FF5A36 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 10px rgba(255, 90, 54, 0.28);
+        box-shadow: 0 4px 10px rgba(255, 90, 54, 0.22);
         flex-shrink: 0;
-        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .brand-logo-container:hover .brand-logo-icon {
-        transform: scale(1.08) rotate(-3deg);
+        transition: transform 0.2s ease;
     }
     .brand-name {
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         font-weight: 800;
         color: #0F172A;
         letter-spacing: -0.02em;
         line-height: 1.15;
     }
     .brand-tag {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         font-weight: 700;
         color: #FF5A36;
         letter-spacing: 0.08em;
     }
+    .sidebar-divider {
+        height: 1px;
+        background-color: #F1F5F9;
+        margin: 6px 0 16px 0;
+        width: 100%;
+    }
+    .sidebar-footer-text {
+        font-size: 0.74rem;
+        color: #94A3B8;
+        text-align: center;
+        margin-top: 36px;
+        padding: 0 4px;
+    }
 
-    /* Sidebar Toggle Buttons (« and ») */
-    div[class*="st-key-toggle_sidebar"] .stButton > button,
-    .st-key-toggle_sidebar_mini button,
-    .st-key-toggle_sidebar_expand button {
-        width: 28px !important;
-        min-width: 28px !important;
-        max-width: 28px !important;
-        height: 28px !important;
+    /* Buttons Container - Expanded */
+    [data-testid="stSidebar"] [data-testid="stElementContainer"],
+    [data-testid="stSidebar"] .stButton {
+        width: 100% !important;
+        margin: 0 !important;
         padding: 0 !important;
+    }
+
+    [data-testid="stSidebar"] .stButton > button {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 14px !important;
+        width: 100% !important;
+        height: 42px !important;
+        padding: 0 14px !important;
+        border: none !important;
+        outline: none !important;
+        border-radius: 10px !important;
+        font-size: 0.93rem !important;
+        font-weight: 500 !important;
+        color: #334155 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        margin: 0 0 6px 0 !important;
+        text-align: left !important;
+        transition: all 0.16s ease !important;
+    }
+
+    /* Fixed 24px icon box */
+    [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 24px !important;
+        min-width: 24px !important;
+        max-width: 24px !important;
+        font-size: 20px !important;
+        color: #475569 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
+        display: flex !important;
+        align-items: center !important;
+        flex: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
+        margin: 0 !important;
+        padding: 0 !important;
+        color: inherit !important;
+        font-size: 0.93rem !important;
+        font-weight: 500 !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    /* Neutral Hover */
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background-color: #F1F5F9 !important;
+        color: #0F172A !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover span[data-testid="stIconMaterial"] {
+        color: #0F172A !important;
+    }
+
+    /* Active Highlight (Soft Coral Pill, NEVER solid orange!) */
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+        background-color: #FFF2ED !important;
+        background: #FFF2ED !important;
+        color: #FF5A36 !important;
+        font-weight: 600 !important;
+        border: 1px solid #FFDCD3 !important;
+        box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
+        color: #FF5A36 !important;
+    }
+
+    /* =========================================================================
+       MINI RAIL MODE (aria-expanded="false") - PERFECT ALIGNMENT WITH LOGO
+       ========================================================================= */
+    [data-testid="stSidebar"][aria-expanded="false"], 
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        width: 76px !important;
+        min-width: 76px !important;
+        max-width: 76px !important;
+        transform: none !important;
+        display: block !important;
+        visibility: visible !important;
+        overflow: hidden !important;
+        overflow-y: hidden !important;
+    }
+
+    /* Equal spacing on both sides: Container width 76px, padding 0 */
+    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarContent"],
+    [data-testid="stSidebar"][aria-expanded="false"] .block-container {
+        padding-top: 10px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow: hidden !important;
+        width: 76px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Hide the header and internal collapse button when already collapsed to prevent double arrows */
+    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarHeader"],
+    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Center the Brand Logo Icon in the 76px rail with top margin for the expand chevron */
+    [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 0 !important;
+        margin: 46px auto 10px auto !important;
+        width: 76px !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-icon {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+        border-radius: 12px !important;
         margin: 0 auto !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .brand-text-block {
+        display: none !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .sidebar-divider {
+        width: 42px !important;
+        margin: 10px auto 14px auto !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .sidebar-footer-text {
+        display: none !important;
+    }
+
+    /* Center every button container in the 76px rail */
+    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stElementContainer"],
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 76px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    /* Button tile: exactly 42px wide, centered in 76px -> exactly 17px padding on left & right */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        max-width: 42px !important;
+        padding: 0 !important;
+        margin: 0 auto 10px auto !important;
         border: none !important;
         outline: none !important;
-        border-radius: 6px !important;
+        border-radius: 12px !important;
         background: transparent !important;
         background-color: transparent !important;
-        color: #94A3B8 !important;
-        font-size: 1.15rem !important;
-        font-weight: 600 !important;
-        line-height: 1 !important;
         box-shadow: none !important;
+    }
+
+    /* Hide text inside button in mini rail mode */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div[data-testid="stMarkdownContainer"] {
+        display: none !important;
+    }
+
+    /* Icon centered inside the 42px tile */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span[data-testid="stIconMaterial"] {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 24px !important;
+        min-width: 24px !important;
+        max-width: 24px !important;
+        font-size: 22px !important;
+        color: #475569 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Mini rail hover */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:hover {
+        background-color: #F1F5F9 !important;
+        color: #0F172A !important;
+        border: none !important;
+        transform: scale(1.08) !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:hover span[data-testid="stIconMaterial"] {
+        color: #0F172A !important;
+    }
+
+    /* Mini rail active - soft peach, NEVER solid orange! */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"] {
+        background-color: #FFF2ED !important;
+        background: #FFF2ED !important;
+        color: #FF5A36 !important;
+        border: 1.5px solid #FFDCD3 !important;
+        box-shadow: 0 2px 6px rgba(255, 90, 54, 0.1) !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
+        color: #FF5A36 !important;
+    }
+
+    /* Streamlit Collapse Chevron (Inside expanded sidebar at top-right) */
+    [data-testid="stSidebarCollapseButton"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    [data-testid="stSidebarCollapseButton"] button {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #94A3B8 !important;
+        border-radius: 6px !important;
         transition: all 0.15s ease !important;
     }
-    div[class*="st-key-toggle_sidebar"] .stButton > button:hover,
-    .st-key-toggle_sidebar_mini button:hover,
-    .st-key-toggle_sidebar_expand button:hover {
+    [data-testid="stSidebarCollapseButton"] button:hover {
         background: #F1F5F9 !important;
-        background-color: #F1F5F9 !important;
         color: #FF5A36 !important;
+    }
+
+    /* Streamlit Expand Chevron (When collapsed, ONE clean arrow centered at X=38px above the 76px rail) */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: flex !important;
+        position: fixed !important;
+        top: 12px !important;
+        left: 24px !important;
+        width: 28px !important;
+        height: 28px !important;
+        z-index: 105 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
+    [data-testid="stSidebarCollapsedControl"] button {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #94A3B8 !important;
+        border-radius: 6px !important;
+        width: 28px !important;
+        height: 28px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.15s ease !important;
+        padding: 0 !important;
+    }
+    [data-testid="stSidebarCollapsedControl"] button:hover {
+        background: #F1F5F9 !important;
+        color: #FF5A36 !important;
+        transform: scale(1.08) !important;
+    }
+    /* When expanded, collapsed control MUST be hidden */
+    [data-testid="stSidebar"][aria-expanded="true"] ~ [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stSidebarCollapsedControl"] {
+        display: none !important;
+    }
+
 
 
 
@@ -632,263 +916,43 @@ st.markdown("""
 
 
 # =====================================================================
-# MINIMAL SLEEK SIDEBAR
+# MINIMAL SLEEK SIDEBAR - EXACTLY 4 BUTTONS, SINGLE ARROW, PERFECT ALIGNMENT
 # =====================================================================
 with st.sidebar:
-    if not st.session_state.sidebar_mini:
-        # EXPANDED MODE: Exactly 4 buttons, perfectly aligned, zero borders, zero scrollbars
-        st.markdown("""
-        <style>
-            [data-testid="stSidebar"], section[data-testid="stSidebar"] {
-                width: 250px !important;
-                min-width: 250px !important;
-                max-width: 250px !important;
-                overflow: hidden !important;
-                overflow-y: hidden !important;
-            }
-            [data-testid="stSidebar"] [data-testid="stSidebarContent"],
-            [data-testid="stSidebar"] .block-container {
-                padding-top: 1.2rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                overflow: hidden !important;
-                overflow-y: hidden !important;
-            }
-            /* Clean Flat Borderless Buttons */
-            [data-testid="stSidebar"] .stButton > button {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                gap: 14px !important;
-                width: 100% !important;
-                height: 42px !important;
-                padding: 0 12px !important;
-                border: none !important;
-                outline: none !important;
-                border-radius: 10px !important;
-                font-size: 0.93rem !important;
-                font-weight: 500 !important;
-                color: #334155 !important;
-                background: transparent !important;
-                background-color: transparent !important;
-                box-shadow: none !important;
-                margin-bottom: 6px !important;
-                text-align: left !important;
-                transition: all 0.16s ease !important;
-            }
-            /* Rigid fixed-width Icon Container for 100% Column Alignment */
-            [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                width: 24px !important;
-                min-width: 24px !important;
-                max-width: 24px !important;
-                font-size: 20px !important;
-                color: #475569 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                flex-shrink: 0 !important;
-            }
-            /* Text Label Alignment */
-            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
-                display: flex !important;
-                align-items: center !important;
-                flex: 1 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
-                margin: 0 !important;
-                padding: 0 !important;
-                color: inherit !important;
-                font-size: 0.93rem !important;
-                font-weight: 500 !important;
-                line-height: 1.2 !important;
-                white-space: nowrap !important;
-            }
-            /* Soft Neutral Hover */
-            [data-testid="stSidebar"] .stButton > button:hover {
-                background-color: #F1F5F9 !important;
-                color: #0F172A !important;
-                border: none !important;
-            }
-            [data-testid="stSidebar"] .stButton > button:hover span[data-testid="stIconMaterial"] {
-                color: #0F172A !important;
-            }
-            /* Soft Peach Active Indicator (NOT solid orange!) */
-            [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-                background-color: #FFF2ED !important;
-                background: #FFF2ED !important;
-                color: #FF5A36 !important;
-                font-weight: 600 !important;
-                border: 1px solid #FFDCD3 !important;
-                box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
-            }
-            [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
-                color: #FF5A36 !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
-
-        col_brand, col_tog = st.columns([4, 1])
-        with col_brand:
-            st.markdown("""
-            <div style="display: flex; align-items: center; gap: 10px; padding: 2px 0 6px 0;">
-                <div class="brand-logo-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
-                        <path d="M14 3V8H19" fill="#FED7C7"/>
-                        <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="brand-text-block">
-                    <div class="brand-name">PDF Master</div>
-                    <div class="brand-tag">TOOLKIT</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_tog:
-            st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-            if st.button("«", key="toggle_sidebar_mini", help="Collapse sidebar"):
-                st.session_state.sidebar_mini = True
-                st.rerun()
-
-        st.markdown("<div style='height: 1px; background: #F1F5F9; margin: 4px 0 14px 0;'></div>", unsafe_allow_html=True)
-
-        # EXACTLY 4 BUTTONS: Dashboard, Recent Files, Settings, Help
-        core_nav = [
-            ("dashboard", ":material/dashboard:", "Dashboard"),
-            ("recent_view", ":material/history:", "Recent Files"),
-            ("settings_view", ":material/settings:", "Settings"),
-            ("help_view", ":material/help:", "Help"),
-        ]
-
-        for key, icon, label in core_nav:
-            is_active = (st.session_state.current_view == key)
-            btn_type = "primary" if is_active else "secondary"
-            if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type):
-                st.session_state.current_view = key
-                st.rerun()
-
-        st.markdown("<div style='height: 32px;'></div><div style='font-size: 0.75rem; color: #94A3B8; text-align: center;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
-
-    else:
-        # MINI RAIL MODE: Clean ~78px width, centered icons ONLY, ZERO scrollbars, ZERO grey box outlines!
-        st.markdown("""
-        <style>
-            [data-testid="stSidebar"], section[data-testid="stSidebar"] {
-                width: 78px !important;
-                min-width: 78px !important;
-                max-width: 78px !important;
-                overflow: hidden !important;
-                overflow-y: hidden !important;
-            }
-            [data-testid="stSidebar"] [data-testid="stSidebarContent"],
-            [data-testid="stSidebar"] .block-container {
-                padding-top: 1rem !important;
-                padding-left: 8px !important;
-                padding-right: 8px !important;
-                overflow: hidden !important;
-                overflow-y: hidden !important;
-            }
-            /* Hide any browser scrollbars */
-            [data-testid="stSidebar"]::-webkit-scrollbar,
-            [data-testid="stSidebar"] *::-webkit-scrollbar {
-                display: none !important;
-                width: 0 !important;
-            }
-            /* Centered, borderless 44px icon tiles */
-            [data-testid="stSidebar"] .stButton > button {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                width: 44px !important;
-                height: 44px !important;
-                min-width: 44px !important;
-                max-width: 44px !important;
-                padding: 0 !important;
-                margin: 0 auto 10px auto !important;
-                border: none !important;
-                outline: none !important;
-                border-radius: 12px !important;
-                color: #475569 !important;
-                background: transparent !important;
-                background-color: transparent !important;
-                box-shadow: none !important;
-                transition: all 0.16s ease !important;
-            }
-            [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 22px !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            /* Hide any text label completely in mini mode */
-            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
-                display: none !important;
-            }
-            /* Soft neutral hover */
-            [data-testid="stSidebar"] .stButton > button:hover {
-                background-color: #F1F5F9 !important;
-                color: #0F172A !important;
-                border: none !important;
-                transform: scale(1.08) !important;
-            }
-            /* Active indicator - soft peach pill with subtle border (NOT solid orange!) */
-            [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-                background-color: #FFF2ED !important;
-                background: #FFF2ED !important;
-                color: #FF5A36 !important;
-                border: 1.5px solid #FFDCD3 !important;
-                box-shadow: 0 2px 6px rgba(255, 90, 54, 0.1) !important;
-            }
-            [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
-                color: #FF5A36 !important;
-            }
-            [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-                background-color: #FFEAE2 !important;
-                color: #E64724 !important;
-                border-color: #FFCFC2 !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
-
-        col_exp, = st.columns([1])
-        with col_exp:
-            if st.button("»", key="toggle_sidebar_expand", help="Expand sidebar"):
-                st.session_state.sidebar_mini = False
-                st.rerun()
-
-        st.markdown("""
-        <div style="display: flex; justify-content: center; margin: 6px 0 12px 0; padding-bottom: 10px; border-bottom: 1px solid #F1F5F9;" title="PDF Master Toolkit">
-            <div class="brand-logo-icon" style="width: 38px; height: 38px;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
-                    <path d="M14 3V8H19" fill="#FED7C7"/>
-                    <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-            </div>
+    # 1. Brand Logo Header (Expands to full logo+text, collapses to centered 42px icon)
+    st.markdown("""
+    <div class="brand-logo-container" title="PDF Master Toolkit">
+        <div class="brand-logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
+                <path d="M14 3V8H19" fill="#FED7C7"/>
+                <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
         </div>
-        """, unsafe_allow_html=True)
+        <div class="brand-text-block">
+            <div class="brand-name">PDF Master</div>
+            <div class="brand-tag">TOOLKIT</div>
+        </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    """, unsafe_allow_html=True)
 
-        # EXACTLY 4 MINI BUTTONS
-        core_mini = [
-            ("dashboard", ":material/dashboard:", "Dashboard"),
-            ("recent_view", ":material/history:", "Recent Files"),
-            ("settings_view", ":material/settings:", "Settings"),
-            ("help_view", ":material/help:", "Help"),
-        ]
+    # 2. EXACTLY 4 CORE BUTTONS: Dashboard, Recent Files, Settings, Help
+    core_nav = [
+        ("dashboard", ":material/dashboard:", "Dashboard"),
+        ("recent_view", ":material/history:", "Recent Files"),
+        ("settings_view", ":material/settings:", "Settings"),
+        ("help_view", ":material/help:", "Help"),
+    ]
 
-        for key, icon, name in core_mini:
-            is_active = (st.session_state.current_view == key)
-            btn_type = "primary" if is_active else "secondary"
-            if st.button("", key=f"mini_{key}", icon=icon, type=btn_type, help=name):
-                st.session_state.current_view = key
-                st.rerun()
+    for key, icon, label in core_nav:
+        is_active = (st.session_state.current_view == key)
+        btn_type = "primary" if is_active else "secondary"
+        if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type, help=label):
+            st.session_state.current_view = key
+            st.rerun()
+
+    st.markdown("<div class='sidebar-footer-text'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
 
 
 
