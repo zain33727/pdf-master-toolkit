@@ -513,12 +513,9 @@ st.markdown("""
         margin-left: 0 !important;
     }
 
-    /* SUPPRESS ALL TEXT IN MINI RAIL MODE - Prevents any vertical text wrapping */
+    /* SUPPRESS ONLY TEXT IN MINI RAIL MODE - Keeps icons 100% visible */
     [data-testid="stSidebar"][aria-expanded="false"] .stButton button [data-testid="stMarkdownContainer"],
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton button p,
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton button div,
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton button span:not([data-testid="stIconMaterial"]),
-    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stMarkdownContainer"] p {
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button [data-testid="stMarkdownContainer"] * {
         display: none !important;
         visibility: hidden !important;
         width: 0 !important;
@@ -531,6 +528,33 @@ st.markdown("""
         opacity: 0 !important;
         position: absolute !important;
         pointer-events: none !important;
+    }
+
+    /* Ensure icons are always visible and centered inside the 44px tile */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button span {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        padding: 0 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button [data-testid="stIconMaterial"] {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 22px !important;
+        line-height: 1 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:not([kind="primary"]) span,
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:not([kind="primary"]) [data-testid="stIconMaterial"] {
+        color: #1E293B !important;
+        fill: #1E293B !important;
     }
 
     /* Streamlit Collapse Chevron (Single arrow inside expanded sidebar at top-right) */
