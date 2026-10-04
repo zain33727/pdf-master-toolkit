@@ -480,7 +480,7 @@ st.markdown("""
         transform: scale(1.05) !important;
     }
 
-    /* Center icon in 44px tile */
+    /* Center icon in 44px tile with zero margin */
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span[data-testid="stIconMaterial"] {
         display: flex !important;
         align-items: center !important;
@@ -489,6 +489,8 @@ st.markdown("""
         font-size: 22px !important;
         color: #1E293B !important;
         margin: 0 !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
         padding: 0 !important;
     }
 
@@ -506,12 +508,17 @@ st.markdown("""
     }
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
         color: #FFFFFF !important;
+        margin: 0 !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
     }
 
     /* SUPPRESS ALL TEXT IN MINI RAIL MODE - Prevents any vertical text wrapping */
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div,
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button p,
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span:not([data-testid="stIconMaterial"]) {
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button [data-testid="stMarkdownContainer"],
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button p,
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button div,
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton button span:not([data-testid="stIconMaterial"]),
+    [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stMarkdownContainer"] p {
         display: none !important;
         visibility: hidden !important;
         width: 0 !important;
@@ -521,6 +528,9 @@ st.markdown("""
         margin: 0 !important;
         padding: 0 !important;
         overflow: hidden !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        pointer-events: none !important;
     }
 
     /* Streamlit Collapse Chevron (Single arrow inside expanded sidebar at top-right) */
@@ -543,7 +553,7 @@ st.markdown("""
     }
 
     /* Streamlit Expand Chevron (Single arrow when collapsed, centered at X=38px above rail) */
-    [data-testid="stSidebarCollapsedControl"],
+    button[data-testid="stExpandSidebarButton"],
     [data-testid="stExpandSidebarButton"] {
         display: flex !important;
         position: fixed !important;
@@ -551,7 +561,7 @@ st.markdown("""
         left: 24px !important;
         width: 28px !important;
         height: 28px !important;
-        z-index: 99999 !important;
+        z-index: 999999 !important;
         align-items: center !important;
         justify-content: center !important;
         background: transparent !important;
@@ -561,7 +571,7 @@ st.markdown("""
         margin: 0 !important;
         padding: 0 !important;
     }
-    [data-testid="stSidebarCollapsedControl"] button,
+    button[data-testid="stExpandSidebarButton"] button,
     [data-testid="stExpandSidebarButton"] button {
         background: transparent !important;
         border: none !important;
@@ -577,15 +587,13 @@ st.markdown("""
         padding: 0 !important;
         margin: 0 !important;
     }
-    [data-testid="stSidebarCollapsedControl"] button:hover,
+    button[data-testid="stExpandSidebarButton"]:hover,
     [data-testid="stExpandSidebarButton"] button:hover {
         background: #F1F5F9 !important;
         color: #FF5A36 !important;
         transform: scale(1.08) !important;
     }
     /* When expanded, collapsed control MUST be hidden */
-    [data-testid="stSidebar"][aria-expanded="true"] ~ [data-testid="stSidebarCollapsedControl"],
-    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stSidebarCollapsedControl"],
     [data-testid="stSidebar"][aria-expanded="true"] ~ [data-testid="stExpandSidebarButton"],
     [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stExpandSidebarButton"] {
         display: none !important;
