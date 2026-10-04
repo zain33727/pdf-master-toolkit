@@ -623,7 +623,7 @@ st.markdown("""
 # =====================================================================
 with st.sidebar:
     if not st.session_state.sidebar_mini:
-        # EXPANDED MODE: Beautiful 250px clean sidebar (no borders, soft hover, soft peach active pill)
+        # EXPANDED MODE: Pixel-perfect layout matching the reference mockup
         st.markdown("""
         <style>
             [data-testid="stSidebar"], section[data-testid="stSidebar"] {
@@ -632,50 +632,126 @@ with st.sidebar:
                 max-width: 250px !important;
             }
             [data-testid="stSidebar"] .block-container {
-                padding-top: 1.4rem !important;
-                padding-left: 1.1rem !important;
-                padding-right: 1.1rem !important;
+                padding-top: 1.2rem !important;
+                padding-left: 0.9rem !important;
+                padding-right: 0.9rem !important;
             }
+            /* Flat, clean borderless buttons with perfect alignment */
             [data-testid="stSidebar"] .stButton > button {
                 display: flex !important;
+                flex-direction: row !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
+                gap: 12px !important;
                 width: 100% !important;
-                height: 42px !important;
-                padding: 0 14px !important;
+                height: 38px !important;
+                padding: 0 10px !important;
                 border: none !important;
                 outline: none !important;
-                border-radius: 10px !important;
-                font-size: 0.92rem !important;
+                border-radius: 8px !important;
+                font-size: 0.91rem !important;
                 font-weight: 500 !important;
-                color: #475569 !important;
+                color: #334155 !important;
                 background: transparent !important;
                 background-color: transparent !important;
-                white-space: nowrap !important;
                 box-shadow: none !important;
-                margin-bottom: 4px !important;
-                transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                margin-bottom: 2px !important;
+                text-align: left !important;
+                transition: all 0.15s ease !important;
             }
+            /* Icon alignment: fixed 22px box for uniform vertical column */
+            [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 22px !important;
+                min-width: 22px !important;
+                max-width: 22px !important;
+                font-size: 20px !important;
+                color: #475569 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                flex-shrink: 0 !important;
+            }
+            /* Text alignment */
+            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
+                display: flex !important;
+                align-items: center !important;
+                flex: 1 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
+                margin: 0 !important;
+                padding: 0 !important;
+                color: inherit !important;
+                font-size: 0.91rem !important;
+                font-weight: 500 !important;
+                line-height: 1.2 !important;
+                white-space: nowrap !important;
+            }
+            /* Neutral hover */
             [data-testid="stSidebar"] .stButton > button:hover {
                 background-color: #F1F5F9 !important;
                 color: #0F172A !important;
-                font-weight: 600 !important;
                 border: none !important;
-                transform: translateX(2px) !important;
             }
+            [data-testid="stSidebar"] .stButton > button:hover span[data-testid="stIconMaterial"] {
+                color: #0F172A !important;
+            }
+            /* Active highlight */
             [data-testid="stSidebar"] .stButton > button[kind="primary"] {
                 background-color: #FFF2ED !important;
                 background: #FFF2ED !important;
                 color: #FF5A36 !important;
-                font-weight: 700 !important;
+                font-weight: 600 !important;
                 border: 1px solid #FFDCD3 !important;
                 box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
             }
-            [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-                background-color: #FFEAE2 !important;
-                background: #FFEAE2 !important;
-                color: #E64724 !important;
-                border-color: #FFCFC2 !important;
+            [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
+                color: #FF5A36 !important;
+            }
+
+            /* Document automation badge matching user mockup */
+            .sidebar-badge-wrap {
+                display: flex;
+                align-items: center;
+                margin: 10px 4px 6px 4px;
+            }
+            .sidebar-badge {
+                display: inline-block;
+                background-color: #262626;
+                color: #FFFFFF;
+                font-size: 0.62rem;
+                font-weight: 700;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                padding: 3px 8px;
+                border-radius: 4px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            }
+            /* More tools expander styling */
+            [data-testid="stSidebar"] div[data-testid="stExpander"] {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                margin: 2px 0 0 0 !important;
+                padding: 0 !important;
+            }
+            [data-testid="stSidebar"] div[data-testid="stExpander"] details {
+                border: none !important;
+                background: transparent !important;
+            }
+            [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+                font-size: 0.84rem !important;
+                color: #64748B !important;
+                font-weight: 600 !important;
+                padding: 4px 10px !important;
+                border-radius: 6px !important;
+            }
+            [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover {
+                color: #0F172A !important;
+                background: #F1F5F9 !important;
             }
         </style>
         """, unsafe_allow_html=True)
@@ -683,7 +759,7 @@ with st.sidebar:
         col_brand, col_tog = st.columns([4, 1])
         with col_brand:
             st.markdown("""
-            <div style="display: flex; align-items: center; gap: 10px; padding: 2px 0 6px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 2px 0 4px 0;">
                 <div class="brand-logo-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                         <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
@@ -703,23 +779,77 @@ with st.sidebar:
                 st.session_state.sidebar_mini = True
                 st.rerun()
 
-        st.markdown("<div style='height: 1px; background: #F1F5F9; margin: 6px 0 14px 0;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1px; background: #F1F5F9; margin: 4px 0 8px 0;'></div>", unsafe_allow_html=True)
 
-        nav_links = [
-            ("dashboard", "🏠  Dashboard"),
-            ("recent_view", "🕒  Recent Files"),
-            ("settings_view", "⚙️  Settings"),
-            ("help_view", "❓  Help & Pro Tips"),
+        # Dashboard Top Navigation
+        dash_active = (st.session_state.current_view == "dashboard")
+        if st.button("Dashboard", key="nav_dashboard", icon=":material/dashboard:", type="primary" if dash_active else "secondary"):
+            st.session_state.current_view = "dashboard"
+            st.rerun()
+
+        # DOCUMENT AUTOMATION Section Badge (from user mockup)
+        st.markdown("""
+        <div class="sidebar-badge-wrap">
+            <span class="sidebar-badge">DOCUMENT AUTOMATION</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Primary Tools from user mockup
+        primary_tools = [
+            ("merge", ":material/layers:", "Merge PDF"),
+            ("split", ":material/call_split:", "Split PDF"),
+            ("compress", ":material/compress:", "Compress PDF"),
+            ("security", ":material/lock:", "Protect PDF"),
+            ("ppt2pdf", ":material/slideshow:", "PPT to PDF"),
         ]
 
-        for key, label in nav_links:
+        for key, icon, label in primary_tools:
             is_active = (st.session_state.current_view == key)
             btn_type = "primary" if is_active else "secondary"
-            if st.button(label, key=f"nav_{key}", type=btn_type):
+            if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type):
                 st.session_state.current_view = key
                 st.rerun()
 
-        st.markdown("<div style='height: 24px;'></div><div style='font-size: 0.78rem; color: #94A3B8; padding: 0 4px;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
+        # Additional Tools (Word to PDF, CSV to PDF, Watermark, etc.)
+        secondary_keys = {"word2pdf", "img2pdf", "pdf2img", "watermark", "remove_watermark", "csv2pdf", "pdf2sheet", "extract", "rotate"}
+        is_in_secondary = st.session_state.current_view in secondary_keys
+        with st.expander("More Tools", expanded=is_in_secondary):
+            secondary_tools = [
+                ("word2pdf", ":material/description:", "Word to PDF"),
+                ("img2pdf", ":material/image:", "Image to PDF"),
+                ("pdf2img", ":material/photo_library:", "PDF to Images"),
+                ("watermark", ":material/branding_watermark:", "Watermark PDF"),
+                ("remove_watermark", ":material/ink_eraser:", "Remove Watermark"),
+                ("csv2pdf", ":material/table_view:", "CSV to PDF"),
+                ("pdf2sheet", ":material/grid_on:", "PDF to Excel"),
+                ("extract", ":material/find_in_page:", "Extract Content"),
+                ("rotate", ":material/rotate_right:", "Rotate PDF"),
+            ]
+            for key, icon, label in secondary_tools:
+                is_active = (st.session_state.current_view == key)
+                btn_type = "primary" if is_active else "secondary"
+                if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type):
+                    st.session_state.current_view = key
+                    st.rerun()
+
+        # Divider Line (from user mockup)
+        st.markdown("<div style='height: 1px; background-color: #ECEEF1; margin: 10px 4px 8px 4px;'></div>", unsafe_allow_html=True)
+
+        # Bottom System Navigation (from user mockup)
+        system_nav = [
+            ("recent_view", ":material/history:", "Recent Files"),
+            ("settings_view", ":material/settings:", "Settings"),
+            ("help_view", ":material/help:", "Help"),
+        ]
+
+        for key, icon, label in system_nav:
+            is_active = (st.session_state.current_view == key)
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type):
+                st.session_state.current_view = key
+                st.rerun()
+
+        st.markdown("<div style='height: 14px;'></div><div style='font-size: 0.75rem; color: #94A3B8; padding: 0 4px;'>100% Offline & Private Local Engine</div>", unsafe_allow_html=True)
 
     else:
         # MINI RAIL MODE: 25% width (72px), centered icons ONLY, zero clipped text
@@ -740,20 +870,31 @@ with st.sidebar:
                 align-items: center !important;
                 justify-content: center !important;
                 width: 44px !important;
-                height: 44px !important;
+                height: 38px !important;
                 min-width: 44px !important;
                 max-width: 44px !important;
                 padding: 0 !important;
-                margin: 0 auto 8px auto !important;
+                margin: 0 auto 4px auto !important;
                 border: none !important;
                 outline: none !important;
-                border-radius: 12px !important;
-                font-size: 1.25rem !important;
+                border-radius: 10px !important;
                 color: #475569 !important;
                 background: transparent !important;
                 background-color: transparent !important;
                 box-shadow: none !important;
-                transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                transition: all 0.16s ease !important;
+            }
+            [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 21px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            /* Hide any text in mini rail mode */
+            [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
+                display: none !important;
             }
             [data-testid="stSidebar"] .stButton > button:hover {
                 background-color: #F1F5F9 !important;
@@ -784,9 +925,9 @@ with st.sidebar:
                 st.rerun()
 
         st.markdown("""
-        <div style="display: flex; justify-content: center; margin: 10px 0 14px 0; padding-bottom: 12px; border-bottom: 1px solid #F1F5F9;" title="PDF Master Toolkit">
-            <div class="brand-logo-icon" style="width: 38px; height: 38px;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <div style="display: flex; justify-content: center; margin: 6px 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #F1F5F9;" title="PDF Master Toolkit">
+            <div class="brand-logo-icon" style="width: 36px; height: 36px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M7 3H14L19 8V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V5C5 3.9 5.9 3 7 3Z" fill="#FFFFFF"/>
                     <path d="M14 3V8H19" fill="#FED7C7"/>
                     <path d="M9 13H15M9 16H13" stroke="#FF5A36" stroke-width="1.8" stroke-linecap="round"/>
@@ -795,25 +936,50 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        mini_links = [
-            ("dashboard", "🏠", "Dashboard"),
-            ("recent_view", "🕒", "Recent Files"),
-            ("settings_view", "⚙️", "Settings"),
-            ("help_view", "❓", "Help & Pro Tips"),
+        # Dashboard Mini Button
+        dash_active = (st.session_state.current_view == "dashboard")
+        if st.button("", key="mini_dashboard", icon=":material/dashboard:", type="primary" if dash_active else "secondary", help="Dashboard"):
+            st.session_state.current_view = "dashboard"
+            st.rerun()
+
+        st.markdown("<div style='height: 1px; background-color: #ECEEF1; margin: 6px 4px;'></div>", unsafe_allow_html=True)
+
+        mini_primary = [
+            ("merge", ":material/layers:", "Merge PDF"),
+            ("split", ":material/call_split:", "Split PDF"),
+            ("compress", ":material/compress:", "Compress PDF"),
+            ("security", ":material/lock:", "Protect PDF"),
+            ("ppt2pdf", ":material/slideshow:", "PPT to PDF"),
         ]
 
-        for key, icon, name in mini_links:
+        for key, icon, name in mini_primary:
             is_active = (st.session_state.current_view == key)
             btn_type = "primary" if is_active else "secondary"
-            if st.button(icon, key=f"nav_mini_{key}", type=btn_type, help=name):
+            if st.button("", key=f"mini_{key}", icon=icon, type=btn_type, help=name):
+                st.session_state.current_view = key
+                st.rerun()
+
+        st.markdown("<div style='height: 1px; background-color: #ECEEF1; margin: 6px 4px;'></div>", unsafe_allow_html=True)
+
+        mini_system = [
+            ("recent_view", ":material/history:", "Recent Files"),
+            ("settings_view", ":material/settings:", "Settings"),
+            ("help_view", ":material/help:", "Help"),
+        ]
+
+        for key, icon, name in mini_system:
+            is_active = (st.session_state.current_view == key)
+            btn_type = "primary" if is_active else "secondary"
+            if st.button("", key=f"mini_{key}", icon=icon, type=btn_type, help=name):
                 st.session_state.current_view = key
                 st.rerun()
 
         st.markdown("""
-        <div style="margin-top: 24px; display: flex; justify-content: center;" title="100% Offline & Private Local Engine">
-            <span style="font-size: 1.1rem; opacity: 0.6; cursor: help;">🔒</span>
+        <div style="margin-top: 14px; display: flex; justify-content: center;" title="100% Offline & Private Local Engine">
+            <span style="font-size: 1.05rem; opacity: 0.6; cursor: help;">🔒</span>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
