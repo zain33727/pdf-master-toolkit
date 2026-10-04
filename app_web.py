@@ -287,50 +287,57 @@ st.markdown("""
 
     /* Buttons Container - Expanded */
     [data-testid="stSidebar"] [data-testid="stElementContainer"],
+    /* =========================================================================
+       BUTTON STYLES - EXPANDED STATE (Matches Image 1: Solid orange active, white rounded cards inactive)
+       ========================================================================= */
+    [data-testid="stSidebar"] [data-testid="stElementContainer"],
     [data-testid="stSidebar"] .stButton {
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
+    /* Inactive button in expanded state - Clean white card with rounded border */
     [data-testid="stSidebar"] .stButton > button {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 14px !important;
+        gap: 12px !important;
         width: 100% !important;
-        height: 42px !important;
-        padding: 0 14px !important;
-        border: none !important;
+        height: 44px !important;
+        padding: 0 16px !important;
+        border: 1px solid #E2E8F0 !important;
         outline: none !important;
-        border-radius: 10px !important;
-        font-size: 0.93rem !important;
+        border-radius: 12px !important;
+        font-size: 0.95rem !important;
         font-weight: 500 !important;
-        color: #334155 !important;
-        background: transparent !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
-        margin: 0 0 6px 0 !important;
+        color: #1E293B !important;
+        background: #FFFFFF !important;
+        background-color: #FFFFFF !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+        margin: 0 0 10px 0 !important;
         text-align: left !important;
         transition: all 0.16s ease !important;
     }
-
-    /* Fixed 24px icon box */
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background-color: #F8FAFC !important;
+        border-color: #CBD5E1 !important;
+        color: #0F172A !important;
+    }
     [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 24px !important;
-        min-width: 24px !important;
-        max-width: 24px !important;
+        width: 22px !important;
+        min-width: 22px !important;
+        max-width: 22px !important;
         font-size: 20px !important;
-        color: #475569 !important;
+        color: #1E293B !important;
         margin: 0 !important;
         padding: 0 !important;
         flex-shrink: 0 !important;
     }
-
     [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
         display: flex !important;
         align-items: center !important;
@@ -338,43 +345,40 @@ st.markdown("""
         margin: 0 !important;
         padding: 0 !important;
     }
-
     [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
         margin: 0 !important;
         padding: 0 !important;
-        color: inherit !important;
-        font-size: 0.93rem !important;
+        color: #1E293B !important;
+        font-size: 0.95rem !important;
         font-weight: 500 !important;
         line-height: 1.2 !important;
         white-space: nowrap !important;
     }
 
-    /* Neutral Hover */
-    [data-testid="stSidebar"] .stButton > button:hover {
-        background-color: #F1F5F9 !important;
-        color: #0F172A !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover span[data-testid="stIconMaterial"] {
-        color: #0F172A !important;
-    }
-
-    /* Active Highlight (Soft Coral Pill, NEVER solid orange!) */
+    /* Active button in expanded state - Vibrant Solid Orange */
     [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background-color: #FFF2ED !important;
-        background: #FFF2ED !important;
-        color: #FF5A36 !important;
+        background: #FF5A36 !important;
+        background-color: #FF5A36 !important;
+        color: #FFFFFF !important;
         font-weight: 600 !important;
-        border: 1px solid #FFDCD3 !important;
-        box-shadow: 0 1px 3px rgba(255, 90, 54, 0.08) !important;
+        border: 1px solid #FF5A36 !important;
+        box-shadow: 0 4px 14px rgba(255, 90, 54, 0.28) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+        background: #F04B27 !important;
+        background-color: #F04B27 !important;
+        border-color: #F04B27 !important;
     }
     [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
-        color: #FF5A36 !important;
+        color: #FFFFFF !important;
+    }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] div[data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
     }
 
     /* =========================================================================
-       MINI RAIL MODE (aria-expanded="false") - PERFECT ALIGNMENT WITH LOGO
+       MINI RAIL MODE (aria-expanded="false") - PERFECT ALIGNMENT & SPACING
        ========================================================================= */
     [data-testid="stSidebar"][aria-expanded="false"], 
     section[data-testid="stSidebar"][aria-expanded="false"] {
@@ -388,7 +392,7 @@ st.markdown("""
         overflow-y: hidden !important;
     }
 
-    /* Equal spacing on both sides: Container width 76px, padding 0 */
+    /* Container: 76px width, 0 padding on sides for exact symmetry */
     [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarContent"],
     [data-testid="stSidebar"][aria-expanded="false"] .block-container {
         padding-top: 10px !important;
@@ -399,7 +403,7 @@ st.markdown("""
         box-sizing: border-box !important;
     }
 
-    /* Hide the header and internal collapse button when already collapsed to prevent double arrows */
+    /* Hide internal header & collapse button when collapsed */
     [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarHeader"],
     [data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] {
         display: none !important;
@@ -409,20 +413,20 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* Center the Brand Logo Icon in the 76px rail with top margin for the expand chevron */
+    /* Brand Logo Icon: exactly 44px wide, centered at X=38px (16px left, 16px right) */
     [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-container {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         padding: 0 !important;
-        margin: 46px auto 10px auto !important;
+        margin: 48px auto 12px auto !important;
         width: 76px !important;
     }
     [data-testid="stSidebar"][aria-expanded="false"] .brand-logo-icon {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        min-height: 42px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
         border-radius: 12px !important;
         margin: 0 auto !important;
     }
@@ -430,7 +434,7 @@ st.markdown("""
         display: none !important;
     }
     [data-testid="stSidebar"][aria-expanded="false"] .sidebar-divider {
-        width: 42px !important;
+        width: 44px !important;
         margin: 10px auto 14px auto !important;
     }
     [data-testid="stSidebar"][aria-expanded="false"] .sidebar-footer-text {
@@ -448,68 +452,78 @@ st.markdown("""
         padding: 0 !important;
     }
 
-    /* Button tile: exactly 42px wide, centered in 76px -> exactly 17px padding on left & right */
+    /* Inactive button in collapsed state: 44px square tile, centered at X=38px (16px left, 16px right) */
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        max-width: 42px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
         padding: 0 !important;
         margin: 0 auto 10px auto !important;
-        border: none !important;
+        border: 1px solid #E2E8F0 !important;
         outline: none !important;
         border-radius: 12px !important;
-        background: transparent !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
+        background: #FFFFFF !important;
+        background-color: #FFFFFF !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:hover {
+        background-color: #F8FAFC !important;
+        border-color: #CBD5E1 !important;
+        transform: scale(1.05) !important;
     }
 
-    /* Hide text inside button in mini rail mode */
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div[data-testid="stMarkdownContainer"] {
-        display: none !important;
-    }
-
-    /* Icon centered inside the 42px tile */
+    /* Center icon in 44px tile */
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span[data-testid="stIconMaterial"] {
-        display: inline-flex !important;
+        display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         width: 24px !important;
-        min-width: 24px !important;
-        max-width: 24px !important;
         font-size: 22px !important;
-        color: #475569 !important;
+        color: #1E293B !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    /* Mini rail hover */
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:hover {
-        background-color: #F1F5F9 !important;
-        color: #0F172A !important;
-        border: none !important;
-        transform: scale(1.08) !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button:hover span[data-testid="stIconMaterial"] {
-        color: #0F172A !important;
-    }
-
-    /* Mini rail active - soft peach, NEVER solid orange! */
+    /* Active button in collapsed state: Solid orange 44px square tile */
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"] {
-        background-color: #FFF2ED !important;
-        background: #FFF2ED !important;
-        color: #FF5A36 !important;
-        border: 1.5px solid #FFDCD3 !important;
-        box-shadow: 0 2px 6px rgba(255, 90, 54, 0.1) !important;
+        background: #FF5A36 !important;
+        background-color: #FF5A36 !important;
+        border: 1px solid #FF5A36 !important;
+        box-shadow: 0 4px 14px rgba(255, 90, 54, 0.28) !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"]:hover {
+        background: #F04B27 !important;
+        background-color: #F04B27 !important;
+        border-color: #F04B27 !important;
     }
     [data-testid="stSidebar"][aria-expanded="false"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
-        color: #FF5A36 !important;
+        color: #FFFFFF !important;
     }
 
-    /* Streamlit Collapse Chevron (Inside expanded sidebar at top-right) */
+    /* SUPPRESS ALL TEXT IN MINI RAIL MODE - Prevents any vertical text wrapping */
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button div,
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button p,
+    [data-testid="stSidebar"][aria-expanded="false"] .stButton > button span:not([data-testid="stIconMaterial"]) {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Streamlit Collapse Chevron (Single arrow inside expanded sidebar at top-right) */
     [data-testid="stSidebarCollapseButton"] {
         display: flex !important;
         align-items: center !important;
@@ -528,22 +542,27 @@ st.markdown("""
         color: #FF5A36 !important;
     }
 
-    /* Streamlit Expand Chevron (When collapsed, ONE clean arrow centered at X=38px above the 76px rail) */
-    [data-testid="stSidebarCollapsedControl"] {
+    /* Streamlit Expand Chevron (Single arrow when collapsed, centered at X=38px above rail) */
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stExpandSidebarButton"] {
         display: flex !important;
         position: fixed !important;
-        top: 12px !important;
+        top: 14px !important;
         left: 24px !important;
         width: 28px !important;
         height: 28px !important;
-        z-index: 105 !important;
+        z-index: 99999 !important;
         align-items: center !important;
         justify-content: center !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
-    [data-testid="stSidebarCollapsedControl"] button {
+    [data-testid="stSidebarCollapsedControl"] button,
+    [data-testid="stExpandSidebarButton"] button {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -556,15 +575,19 @@ st.markdown("""
         justify-content: center !important;
         transition: all 0.15s ease !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
-    [data-testid="stSidebarCollapsedControl"] button:hover {
+    [data-testid="stSidebarCollapsedControl"] button:hover,
+    [data-testid="stExpandSidebarButton"] button:hover {
         background: #F1F5F9 !important;
         color: #FF5A36 !important;
         transform: scale(1.08) !important;
     }
     /* When expanded, collapsed control MUST be hidden */
     [data-testid="stSidebar"][aria-expanded="true"] ~ [data-testid="stSidebarCollapsedControl"],
-    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stSidebarCollapsedControl"] {
+    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebar"][aria-expanded="true"] ~ [data-testid="stExpandSidebarButton"],
+    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stExpandSidebarButton"] {
         display: none !important;
     }
 
