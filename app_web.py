@@ -245,33 +245,37 @@ st.markdown("""
     div[class*="st-key-toggle_sidebar"] .stButton > button,
     .st-key-toggle_sidebar_mini button,
     .st-key-toggle_sidebar_expand button {
-        width: 32px !important;
-        min-width: 32px !important;
-        max-width: 32px !important;
-        height: 32px !important;
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        height: 28px !important;
         padding: 0 !important;
         margin: 0 auto !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 8px !important;
-        background: #FFFFFF !important;
-        color: #475569 !important;
-        font-size: 1.1rem !important;
-        font-weight: 700 !important;
+        border: none !important;
+        outline: none !important;
+        border-radius: 6px !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        color: #94A3B8 !important;
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
         line-height: 1 !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-        transition: all 0.18s ease !important;
+        box-shadow: none !important;
+        transition: all 0.15s ease !important;
     }
     div[class*="st-key-toggle_sidebar"] .stButton > button:hover,
     .st-key-toggle_sidebar_mini button:hover,
     .st-key-toggle_sidebar_expand button:hover {
         background: #F1F5F9 !important;
+        background-color: #F1F5F9 !important;
         color: #FF5A36 !important;
-        border-color: #FFD2C7 !important;
-        transform: scale(1.06) !important;
+        border: none !important;
+        box-shadow: none !important;
     }
+
 
 
     /* Main Container */
