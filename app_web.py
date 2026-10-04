@@ -287,17 +287,13 @@ st.markdown("""
 
     /* Buttons Container - Expanded */
     [data-testid="stSidebar"] [data-testid="stElementContainer"],
-    /* =========================================================================
-       BUTTON STYLES - EXPANDED STATE (Matches Image 1: Solid orange active, white rounded cards inactive)
-       ========================================================================= */
-    [data-testid="stSidebar"] [data-testid="stElementContainer"],
     [data-testid="stSidebar"] .stButton {
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    /* Inactive button in expanded state - Clean white card with rounded border */
+    /* Inactive button in expanded state - Equal full length, clean white card with rounded border */
     [data-testid="stSidebar"] .stButton > button {
         display: flex !important;
         flex-direction: row !important;
@@ -305,7 +301,9 @@ st.markdown("""
         justify-content: flex-start !important;
         gap: 12px !important;
         width: 100% !important;
-        height: 44px !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        height: 46px !important;
         padding: 0 16px !important;
         border: 1px solid #E2E8F0 !important;
         outline: none !important;
@@ -316,7 +314,7 @@ st.markdown("""
         background: #FFFFFF !important;
         background-color: #FFFFFF !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 14px 0 !important;
         text-align: left !important;
         transition: all 0.16s ease !important;
     }
@@ -355,7 +353,7 @@ st.markdown("""
         white-space: nowrap !important;
     }
 
-    /* Active button in expanded state - Vibrant Solid Orange */
+    /* Active button in expanded state - Equal full length, Vibrant Solid Orange */
     [data-testid="stSidebar"] .stButton > button[kind="primary"] {
         background: #FF5A36 !important;
         background-color: #FF5A36 !important;
@@ -363,6 +361,10 @@ st.markdown("""
         font-weight: 600 !important;
         border: 1px solid #FF5A36 !important;
         box-shadow: 0 4px 14px rgba(255, 90, 54, 0.28) !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 14px 0 !important;
     }
     [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
         background: #F04B27 !important;
@@ -1003,7 +1005,7 @@ with st.sidebar:
     for key, icon, label in core_nav:
         is_active = (st.session_state.current_view == key)
         btn_type = "primary" if is_active else "secondary"
-        if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type, help=label):
+        if st.button(label, key=f"nav_{key}", icon=icon, type=btn_type, help=label, use_container_width=True):
             st.session_state.current_view = key
             st.rerun()
 
