@@ -293,8 +293,9 @@ st.markdown("""
         padding: 0 !important;
     }
 
-    /* Inactive button in expanded state - Equal full length, clean white card with rounded border */
-    [data-testid="stSidebar"] .stButton > button {
+    /* Inactive button in expanded state - Equal full length, left-aligned, clean white card */
+    [data-testid="stSidebar"] .stButton > button,
+    [data-testid="stSidebar"] button[data-testid="stBaseButton-secondary"] {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
@@ -304,7 +305,7 @@ st.markdown("""
         min-width: 100% !important;
         max-width: 100% !important;
         height: 46px !important;
-        padding: 0 16px !important;
+        padding: 0 18px !important;
         border: 1px solid #E2E8F0 !important;
         outline: none !important;
         border-radius: 12px !important;
@@ -318,7 +319,8 @@ st.markdown("""
         text-align: left !important;
         transition: all 0.16s ease !important;
     }
-    [data-testid="stSidebar"] .stButton > button:hover {
+    [data-testid="stSidebar"] .stButton > button:hover,
+    [data-testid="stSidebar"] button[data-testid="stBaseButton-secondary"]:hover {
         background-color: #F8FAFC !important;
         border-color: #CBD5E1 !important;
         color: #0F172A !important;
@@ -339,9 +341,11 @@ st.markdown("""
     [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
         display: flex !important;
         align-items: center !important;
+        justify-content: flex-start !important;
         flex: 1 !important;
         margin: 0 !important;
         padding: 0 !important;
+        text-align: left !important;
     }
     [data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
         margin: 0 !important;
@@ -351,10 +355,19 @@ st.markdown("""
         font-weight: 500 !important;
         line-height: 1.2 !important;
         white-space: nowrap !important;
+        text-align: left !important;
     }
 
-    /* Active button in expanded state - Equal full length, Vibrant Solid Orange */
-    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    /* Active button in expanded state - Equal full length, left-aligned, Vibrant Solid Orange */
+    [data-testid="stSidebar"] .stButton > button[kind="primary"],
+    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"] {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
+        padding: 0 18px !important;
+        text-align: left !important;
         background: #FF5A36 !important;
         background-color: #FF5A36 !important;
         color: #FFFFFF !important;
@@ -366,7 +379,8 @@ st.markdown("""
         max-width: 100% !important;
         margin: 0 0 14px 0 !important;
     }
-    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover,
+    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"]:hover {
         background: #F04B27 !important;
         background-color: #F04B27 !important;
         border-color: #F04B27 !important;
@@ -374,9 +388,16 @@ st.markdown("""
     [data-testid="stSidebar"] .stButton > button[kind="primary"] span[data-testid="stIconMaterial"] {
         color: #FFFFFF !important;
     }
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] div[data-testid="stMarkdownContainer"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+    }
     [data-testid="stSidebar"] .stButton > button[kind="primary"] div[data-testid="stMarkdownContainer"] p {
         color: #FFFFFF !important;
         font-weight: 600 !important;
+        text-align: left !important;
     }
 
     /* =========================================================================
